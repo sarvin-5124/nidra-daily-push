@@ -67,14 +67,14 @@ jobs:
 
       - name: Send slot
         env:
-          NIDRA_API_URL: ${{ vars.NIDRA_API_URL }}
+          NIDRA_API_URL: ${{ vars.NIDRA_API_URL || secrets.NIDRA_API_URL }}
           NIDRA_ADMIN_USER: ${{ secrets.NIDRA_ADMIN_USER }}
           NIDRA_ADMIN_PASS: ${{ secrets.NIDRA_ADMIN_PASS }}
-          NTFY_BASE: ${{ vars.NTFY_BASE }}
-          NTFY_TOPIC_OK: ${{ vars.NTFY_TOPIC_OK }}
-          NTFY_TOPIC_FAIL: ${{ vars.NTFY_TOPIC_FAIL }}
+          NTFY_BASE: ${{ vars.NTFY_BASE || secrets.NTFY_BASE }}
+          NTFY_TOPIC_OK: ${{ vars.NTFY_TOPIC_OK || secrets.NTFY_TOPIC_OK }}
+          NTFY_TOPIC_FAIL: ${{ vars.NTFY_TOPIC_FAIL || secrets.NTFY_TOPIC_FAIL }}
           NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
-          FAIL_RATE_ALERT: ${{ vars.FAIL_RATE_ALERT }}
+          FAIL_RATE_ALERT: ${{ vars.FAIL_RATE_ALERT || secrets.FAIL_RATE_ALERT }}
           SLOT_KEY: ${{ inputs.slot }}
           # Cron runs carry no inputs, so both default to the scheduled audience.
           AUDIENCE_MODE: ${{ inputs.audience_mode }}

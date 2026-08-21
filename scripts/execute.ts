@@ -36,7 +36,14 @@ const MAX_WAIT_MIN = 45;
  * send: targeted fell 3891 -> 2025 on the very next campaign three hours later.
  * 10% sits clear of the normal band and still catches that.
  */
-const FAIL_RATE_ALERT = Number(process.env.FAIL_RATE_ALERT ?? 10) / 100;
+const FAIL_RATE_ALERT = (() => {
+  // Actions always defines the env key, so an unset variable arrives as "" — and
+  // `??` does not catch that. Number("") is 0, which would put the threshold at
+  // 0% and page the fail topic on every send.
+  const raw = (process.env.FAIL_RATE_ALERT ?? '').trim();
+  const pct = raw === '' ? 10 : Number(raw);
+  return (Number.isFinite(pct) && pct > 0 ? pct : 10) / 100;
+})();
 /**
  * A single-recipient test send targets ONE user id instead of the whole base.
  * The backend's audience contract is mode `all | segment | tokens | userIds |

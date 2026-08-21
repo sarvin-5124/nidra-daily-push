@@ -37,10 +37,10 @@ jobs:
 
       - name: Build schedule
         env:
-          NIDRA_API_URL: ${{ vars.NIDRA_API_URL }}
-          NTFY_BASE: ${{ vars.NTFY_BASE }}
-          NTFY_TOPIC_OK: ${{ vars.NTFY_TOPIC_OK }}
-          NTFY_TOPIC_FAIL: ${{ vars.NTFY_TOPIC_FAIL }}
+          NIDRA_API_URL: ${{ vars.NIDRA_API_URL || secrets.NIDRA_API_URL }}
+          NTFY_BASE: ${{ vars.NTFY_BASE || secrets.NTFY_BASE }}
+          NTFY_TOPIC_OK: ${{ vars.NTFY_TOPIC_OK || secrets.NTFY_TOPIC_OK }}
+          NTFY_TOPIC_FAIL: ${{ vars.NTFY_TOPIC_FAIL || secrets.NTFY_TOPIC_FAIL }}
           NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
           SCHEDULE_DATE: ${{ inputs.date }}
         run: bun run scripts/plan.ts

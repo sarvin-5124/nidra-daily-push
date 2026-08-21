@@ -70,15 +70,22 @@ bun run validate     # NIDRA_API_URL set → checks against the live catalog
 
 ## Configuration
 
-Repository **variables** (not secret):
+These five may be set as repository **variables** or **secrets** — the workflows
+read `${{ vars.X || secrets.X }}`, so either tab works. Variables are easier to
+debug, because a secret is masked as `***` everywhere in the logs.
 
 | Name | Example |
 |---|---|
-| `NIDRA_API_URL` | `https://api.nidra.app` |
+| `NIDRA_API_URL` | HTTPS base URL of the backend, no trailing slash |
 | `NTFY_BASE` | `https://ntfy.sh` |
-| `NTFY_TOPIC_OK` | `nidra-push-ok` |
-| `NTFY_TOPIC_FAIL` | `nidra-push-fail` |
+| `NTFY_TOPIC_OK` | `nidra-push-ok-<random>` |
+| `NTFY_TOPIC_FAIL` | `nidra-push-fail-<random>` |
 | `FAIL_RATE_ALERT` | optional; percent, default `10` |
+
+An unset variable arrives at the script as an **empty string**, not as absent —
+Actions always defines the env key. Anything reading one has to treat `""` as
+unset, which is why `FAIL_RATE_ALERT` parses empty and non-numeric values back to
+its 10% default instead of using `??`.
 
 Repository **secrets**:
 
