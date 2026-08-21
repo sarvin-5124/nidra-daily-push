@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "date": "2026-08-22",
+  "tz": "Asia/Kolkata",
+  "generatedAt": "2026-08-21T18:25:00+05:30",
+  "generatedBy": "gha:32484176666",
+  "slots": [
+    {
+      "key": "morning_focus",
+      "slotAt": "10:00",
+      "jitterMin": 16,
+      "sendAt": "2026-08-22T10:16:00+05:30",
+      "item": {
+        "kind": "meditations",
+        "id": "med-yognidra",
+        "title": "Yog Nidra",
+        "durationMin": 13
+      },
+      "copyId": "mf-37",
+      "title": "Your to-do list can wait 🌄",
+      "body": "It will not grow while you rest. Start Yog Nidra first.",
+      "route": "/(app)/player/med-yognidra?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    },
+    {
+      "key": "afternoon_soundscape",
+      "slotAt": "14:00",
+      "jitterMin": 28,
+      "sendAt": "2026-08-22T14:28:00+05:30",
+      "item": {
+        "kind": "soundscapes",
+        "id": "waves",
+        "title": "Waves",
+        "durationMin": 20
+      },
+      "copyId": "as-08",
+      "title": "Close your tabs for a bit 🌿",
+      "body": "Play Waves. For a while, nothing else needs you.",
+      "route": "/(app)/player/waves?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    },
+    {
+      "key": "evening_meditation",
+      "slotAt": "17:00",
+      "jitterMin": 20,
+      "sendAt": "2026-08-22T17:20:00+05:30",
+      "item": {
+        "kind": "meditations",
+        "id": "med-evening-wind-down",
+        "title": "Wind Down",
+        "durationMin": 3
+      },
+      "copyId": "em-13",
+      "title": "Change gear before you go home ✨",
+      "body": "Work straight into family rarely goes well. Start Wind Down first.",
+      "route": "/(app)/player/med-evening-wind-down?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    },
+    {
+      "key": "evening_soundscape",
+      "slotAt": "19:00",
+      "jitterMin": 22,
+      "sendAt": "2026-08-22T19:22:00+05:30",
+      "item": {
+        "kind": "soundscapes",
+        "id": "om",
+        "title": "Om",
+        "durationMin": 20
+      },
+      "copyId": "es-24",
+      "title": "Make the room feel calmer",
+      "body": "That is mostly sound. Play Om and hear the difference.",
+      "route": "/(app)/player/om?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    },
+    {
+      "key": "night_nidra",
+      "slotAt": "21:30",
+      "jitterMin": 7,
+      "sendAt": "2026-08-22T21:37:00+05:30",
+      "item": {
+        "kind": "sessions",
+        "id": "sleep-onset",
+        "title": "Sleep Onset",
+        "durationMin": 17
+      },
+      "copyId": "nn-26",
+      "title": "You can stop for today 🌙",
+      "body": "Start Sleep Onset. Everything else begins again tomorrow.",
+      "route": "/(app)/player/sleep-onset?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    }
+  ]
+}
