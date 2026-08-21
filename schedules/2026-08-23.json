@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "date": "2026-08-23",
+  "tz": "Asia/Kolkata",
+  "generatedAt": "2026-08-22T00:35:33+05:30",
+  "generatedBy": "gha:32516667162",
+  "slots": [
+    {
+      "key": "morning_focus",
+      "slotAt": "10:00",
+      "jitterMin": 23,
+      "sendAt": "2026-08-23T10:23:00+05:30",
+      "item": {
+        "kind": "meditations",
+        "id": "med-focus-breathing",
+        "title": "Focus Breathing",
+        "durationMin": 4
+      },
+      "copyId": "mf-10",
+      "title": "Drop everything for a bit 🌄",
+      "body": "Your list will still be there. Start Focus Breathing first.",
+      "route": "/(app)/player/med-focus-breathing?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    },
+    {
+      "key": "afternoon_soundscape",
+      "slotAt": "14:00",
+      "jitterMin": 8,
+      "sendAt": "2026-08-23T14:08:00+05:30",
+      "item": {
+        "kind": "soundscapes",
+        "id": "calm",
+        "title": "Calm",
+        "durationMin": 20
+      },
+      "copyId": "as-30",
+      "title": "Play Calm for the slow hour",
+      "body": "Give it a few minutes. It changes the mood of a room.",
+      "route": "/(app)/player/calm?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    },
+    {
+      "key": "evening_meditation",
+      "slotAt": "17:00",
+      "jitterMin": 23,
+      "sendAt": "2026-08-23T17:23:00+05:30",
+      "item": {
+        "kind": "meditations",
+        "id": "med-yognidra",
+        "title": "Yog Nidra",
+        "durationMin": 13
+      },
+      "copyId": "em-04",
+      "title": "Still thinking about that meeting?",
+      "body": "Most of us are. Start Yog Nidra and set it down.",
+      "route": "/(app)/player/med-yognidra?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    },
+    {
+      "key": "evening_soundscape",
+      "slotAt": "19:00",
+      "jitterMin": 21,
+      "sendAt": "2026-08-23T19:21:00+05:30",
+      "item": {
+        "kind": "soundscapes",
+        "id": "dream",
+        "title": "Dream",
+        "durationMin": 20
+      },
+      "copyId": "es-15",
+      "title": "You have been on since morning",
+      "body": "Play Dream for 20 minutes and switch off properly.",
+      "route": "/(app)/player/dream?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    },
+    {
+      "key": "night_nidra",
+      "slotAt": "21:30",
+      "jitterMin": 21,
+      "sendAt": "2026-08-23T21:51:00+05:30",
+      "item": {
+        "kind": "sessions",
+        "id": "deep-healing",
+        "title": "Deep Healing",
+        "durationMin": 21
+      },
+      "copyId": "nn-36",
+      "title": "That is enough for today 🌙",
+      "body": "Lie back and start Deep Healing. Let the night have the rest.",
+      "route": "/(app)/player/deep-healing?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    }
+  ]
+}
