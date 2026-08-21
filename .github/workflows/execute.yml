@@ -86,4 +86,5 @@ jobs:
         # Runs even on failure: a failed attempt is written back too, and that
         # record is what stops a rerun from double-sending.
         if: always()
-        run: bash .github/scripts/commit-schedules.sh "chore: record send result"
+        run: |
+          bash .github/scripts/commit-schedules.sh "chore: record send result"
