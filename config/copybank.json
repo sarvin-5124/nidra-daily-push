@@ -1,0 +1,866 @@
+{
+  "version": 1,
+  "notes": "Copy may use only {item} (catalog title, verbatim) and {min} (whole-minute duration); every line must read naturally for the longest item its slot can serve. Voice and distribution follow the 41 hand-sent campaigns: verb-led instruction, the session named often in the title, Start for guided sessions and Play/Listen for soundscapes, duration mentioned sparingly. See learnings/push-send-history-signals.md.",
+  "slots": {
+    "morning_focus": {
+      "variants": [
+        {
+          "id": "mf-01",
+          "title": "Take a break right now 🌄",
+          "body": "Start {item}. Your mind has been going since morning."
+        },
+        {
+          "id": "mf-02",
+          "title": "Stop for {min} minutes",
+          "body": "Open {item}, close your eyes, and let your mind settle."
+        },
+        {
+          "id": "mf-03",
+          "title": "Start {item} now 🌿",
+          "body": "You have been at it all morning. Your mind needs a rest."
+        },
+        {
+          "id": "mf-04",
+          "title": "Your mind needs a break",
+          "body": "Not later. Now. Start {item} and give it your attention."
+        },
+        {
+          "id": "mf-05",
+          "title": "Close your eyes for {min} minutes ✨",
+          "body": "Start {item} and let your head go quiet for a while."
+        },
+        {
+          "id": "mf-06",
+          "title": "Sit back and press play 🍃",
+          "body": "{item} is ready. Give it your attention and you will think clearer."
+        },
+        {
+          "id": "mf-07",
+          "title": "Feeling scattered? Fix it now",
+          "body": "Start {item} and come back to your desk sharper."
+        },
+        {
+          "id": "mf-08",
+          "title": "{item} is ready for you 🌿",
+          "body": "Take the time now. The rest of the work gets easier."
+        },
+        {
+          "id": "mf-09",
+          "title": "Give yourself {min} minutes",
+          "body": "That is it. Start {item} and do nothing else."
+        },
+        {
+          "id": "mf-10",
+          "title": "Drop everything for a bit 🌄",
+          "body": "Your list will still be there. Start {item} first."
+        },
+        {
+          "id": "mf-11",
+          "title": "Try {item}, not more coffee",
+          "body": "It clears your head without the crash that comes after."
+        },
+        {
+          "id": "mf-12",
+          "title": "Clear your head now 🍃",
+          "body": "Start {item}. Short, simple, and it works."
+        },
+        {
+          "id": "mf-13",
+          "title": "How is your focus right now?",
+          "body": "If it is slipping, start {item} for {min} minutes."
+        },
+        {
+          "id": "mf-14",
+          "title": "Pause before your next task 🌿",
+          "body": "Start {item}. You will begin the next one in a better state."
+        },
+        {
+          "id": "mf-16",
+          "title": "Do this before your inbox ✨",
+          "body": "Open {item} and take a few quiet minutes for yourself."
+        },
+        {
+          "id": "mf-18",
+          "title": "Do one small thing now 🌿",
+          "body": "Start {item}. Nothing hard, nothing to learn. Just follow along."
+        },
+        {
+          "id": "mf-20",
+          "title": "Shut your eyes and listen 🍃",
+          "body": "Start {item}. The noise in your head drops away."
+        },
+        {
+          "id": "mf-21",
+          "title": "Same practice, same time 🍃",
+          "body": "Start {item} today as well. That is how the habit sticks."
+        },
+        {
+          "id": "mf-22",
+          "title": "{item} is still waiting",
+          "body": "Been a few days? Start it now, with no catching up to do."
+        },
+        {
+          "id": "mf-23",
+          "title": "Begin again today 🌄",
+          "body": "Start {item} right now. One session, nothing more."
+        },
+        {
+          "id": "mf-25",
+          "title": "Take one deep breath ✨",
+          "body": "Now take {min} more minutes with {item}. That is the whole thing."
+        },
+        {
+          "id": "mf-27",
+          "title": "Put your headphones on 🌿",
+          "body": "Start {item} and let the room go quiet for {min} minutes."
+        },
+        {
+          "id": "mf-28",
+          "title": "Get your energy back",
+          "body": "Start {item}. Calm energy lasts longer than forcing it."
+        },
+        {
+          "id": "mf-30",
+          "title": "Start {item} and follow along 🍃",
+          "body": "Do nothing else for the whole session. That is the only instruction."
+        },
+        {
+          "id": "mf-31",
+          "title": "Train your focus today ✨",
+          "body": "Start {item} for {min} minutes. Focus improves with practice."
+        },
+        {
+          "id": "mf-32",
+          "title": "Too many things at once?",
+          "body": "Start {item}. It gives your mind one thing to hold."
+        },
+        {
+          "id": "mf-34",
+          "title": "Try {min} minutes today",
+          "body": "Less time than you spend on your phone, and your head feels lighter."
+        },
+        {
+          "id": "mf-35",
+          "title": "Make room for {item} 🌿",
+          "body": "Start it whenever the morning begins to feel heavy."
+        },
+        {
+          "id": "mf-36",
+          "title": "You do not have to earn rest",
+          "body": "Take the break now. Start {item} and sit quietly."
+        },
+        {
+          "id": "mf-37",
+          "title": "Your to-do list can wait 🌄",
+          "body": "It will not grow while you rest. Start {item} first."
+        },
+        {
+          "id": "mf-38",
+          "title": "Calm mind, better work ✨",
+          "body": "Start {item} for {min} minutes and see the difference today."
+        },
+        {
+          "id": "mf-39",
+          "title": "Just {min} minutes, nothing more 🌿",
+          "body": "Press play on {item} and follow along. That is all."
+        },
+        {
+          "id": "mf-40",
+          "title": "Start {item} today 🍃",
+          "body": "Take {min} minutes now. You will be glad an hour later."
+        }
+      ]
+    },
+    "afternoon_soundscape": {
+      "variants": [
+        {
+          "id": "as-03",
+          "title": "{min} minutes of {item} 🌊",
+          "body": "Finish a task with it on, or sit and do nothing at all."
+        },
+        {
+          "id": "as-04",
+          "title": "Stop scrolling, play sound 🍃",
+          "body": "One of them actually rests you. The other only looks like it."
+        },
+        {
+          "id": "as-05",
+          "title": "Turn the afternoon down",
+          "body": "Put {item} on low and keep going with your work."
+        },
+        {
+          "id": "as-06",
+          "title": "Take the full {min} minutes ✨",
+          "body": "You do not have to explain a break. Play {item} and rest."
+        },
+        {
+          "id": "as-07",
+          "title": "Pick {item} and press play",
+          "body": "Let it run, and the room around you changes."
+        },
+        {
+          "id": "as-08",
+          "title": "Close your tabs for a bit 🌿",
+          "body": "Play {item}. For a while, nothing else needs you."
+        },
+        {
+          "id": "as-11",
+          "title": "Hear what {item} sounds like 🍃",
+          "body": "Give it {min} minutes, then get back to your day."
+        },
+        {
+          "id": "as-12",
+          "title": "Make the afternoon quieter 🌿",
+          "body": "Play {item}. Steady sound lowers the volume of everything else."
+        },
+        {
+          "id": "as-15",
+          "title": "Work with {item} playing",
+          "body": "Many people focus better with steady sound behind them. Try it."
+        },
+        {
+          "id": "as-16",
+          "title": "Put something steady on 🌊",
+          "body": "{min} minutes of {item}, and the day feels less sharp."
+        },
+        {
+          "id": "as-17",
+          "title": "Give {item} a few minutes",
+          "body": "The same time you would spend checking your phone again."
+        },
+        {
+          "id": "as-18",
+          "title": "Rest is not laziness 🍃",
+          "body": "A short break in the middle of the day is a sensible thing to do."
+        },
+        {
+          "id": "as-19",
+          "title": "Let the room go soft 🌿",
+          "body": "Play {item}. It does the work. You only press play."
+        },
+        {
+          "id": "as-20",
+          "title": "Reset the second half of today",
+          "body": "Play {item} now. Pushing through works much worse."
+        },
+        {
+          "id": "as-21",
+          "title": "Open {item} and let it run ✨",
+          "body": "Give it {min} minutes and feel the afternoon slow down."
+        },
+        {
+          "id": "as-22",
+          "title": "Noisy head? Play quiet sound 🌊",
+          "body": "Sometimes it is that simple. One track, {min} minutes."
+        },
+        {
+          "id": "as-23",
+          "title": "Take the next hour lighter",
+          "body": "Work can wait. {item} is one tap away."
+        },
+        {
+          "id": "as-24",
+          "title": "Go somewhere else for a while ✨",
+          "body": "Play {item}. Quickest way out of a room you have sat in all day."
+        },
+        {
+          "id": "as-25",
+          "title": "Half listening is fine 🍃",
+          "body": "Leave {item} playing while you work. It still calms you down."
+        },
+        {
+          "id": "as-26",
+          "title": "Make the rest of today easier",
+          "body": "Play {item} now, and the afternoon eases up on its own."
+        },
+        {
+          "id": "as-27",
+          "title": "Close your eyes for a bit 🌿",
+          "body": "You have stared at screens all day. Let {item} take over."
+        },
+        {
+          "id": "as-28",
+          "title": "Nothing to follow here 🌊",
+          "body": "No voice, no instructions. Just {item} for {min} minutes."
+        },
+        {
+          "id": "as-29",
+          "title": "{item} is still where you left it",
+          "body": "Come back for another listen whenever you want."
+        },
+        {
+          "id": "as-30",
+          "title": "Play {item} for the slow hour",
+          "body": "Give it a few minutes. It changes the mood of a room."
+        },
+        {
+          "id": "as-31",
+          "title": "Take {min} unhurried minutes 🌿",
+          "body": "No goal, no tracking, no follow-up. Just press play."
+        },
+        {
+          "id": "as-32",
+          "title": "Would a break help right now?",
+          "body": "It usually does. Play {item} whenever you are ready."
+        },
+        {
+          "id": "as-33",
+          "title": "Afternoon feeling long? 🌊",
+          "body": "It gets shorter after {min} minutes of {item}."
+        },
+        {
+          "id": "as-35",
+          "title": "Slow sound, slower breathing ✨",
+          "body": "Put {item} on. Your breath gets longer without you trying."
+        },
+        {
+          "id": "as-36",
+          "title": "These minutes are yours 🍃",
+          "body": "Spend them on {item}, or on looking out of a window."
+        },
+        {
+          "id": "as-37",
+          "title": "Press play and look away",
+          "body": "This one asks nothing from your eyes. Let {item} run."
+        },
+        {
+          "id": "as-38",
+          "title": "One track, {min} minutes 🌊",
+          "body": "That is the whole plan. Everything else can wait."
+        },
+        {
+          "id": "as-39",
+          "title": "Put space between you and work 🌿",
+          "body": "Play {item} for {min} minutes. Come back to the desk after."
+        },
+        {
+          "id": "as-40",
+          "title": "Running low on energy?",
+          "body": "Play {item}. You will feel steadier after, not sleepier."
+        }
+      ]
+    },
+    "evening_meditation": {
+      "variants": [
+        {
+          "id": "em-03",
+          "title": "Put the day down with {item} 🌇",
+          "body": "Start it now and leave the work where it is."
+        },
+        {
+          "id": "em-04",
+          "title": "Still thinking about that meeting?",
+          "body": "Most of us are. Start {item} and set it down."
+        },
+        {
+          "id": "em-05",
+          "title": "Do this before your evening starts ✨",
+          "body": "Start {item} now, and you will actually be present at home."
+        },
+        {
+          "id": "em-06",
+          "title": "Relax your jaw and shoulders 🍃",
+          "body": "Both have been tight since afternoon. Start {item} for {min} minutes."
+        },
+        {
+          "id": "em-07",
+          "title": "Leave the work stress here 🌿",
+          "body": "The tasks wait for tomorrow. Your shoulders should not have to."
+        },
+        {
+          "id": "em-08",
+          "title": "End the day properly",
+          "body": "Start {item}. {min} minutes, and the workday is closed."
+        },
+        {
+          "id": "em-09",
+          "title": "{item} before dinner 🌇",
+          "body": "Food tastes better when your head is not still at work."
+        },
+        {
+          "id": "em-10",
+          "title": "Work not over? Rest anyway",
+          "body": "Start {item} for {min} minutes. You have earned the pause."
+        },
+        {
+          "id": "em-11",
+          "title": "Long day, put it down 🌿",
+          "body": "{min} minutes of {item} and you can stop carrying it."
+        },
+        {
+          "id": "em-12",
+          "title": "Breathe out slowly 🌿",
+          "body": "Start {item}. A long breath out tells the body to relax."
+        },
+        {
+          "id": "em-13",
+          "title": "Change gear before you go home ✨",
+          "body": "Work straight into family rarely goes well. Start {item} first."
+        },
+        {
+          "id": "em-14",
+          "title": "Press play on {item} 🍃",
+          "body": "Give it {min} minutes. After that, the evening is yours."
+        },
+        {
+          "id": "em-15",
+          "title": "{item} fits right now",
+          "body": "A small window, and enough for one practice."
+        },
+        {
+          "id": "em-16",
+          "title": "You showed up all day ✨",
+          "body": "Now show up for a few quiet minutes. Then stop working."
+        },
+        {
+          "id": "em-17",
+          "title": "The evening can wait for {item} 🌇",
+          "body": "Start it first. Everything else begins after that."
+        },
+        {
+          "id": "em-19",
+          "title": "Turn the noise down 🌿",
+          "body": "Start {item}. It clears what you have carried since morning."
+        },
+        {
+          "id": "em-20",
+          "title": "Tired but still restless?",
+          "body": "Very common at this hour. Start {item} for {min} minutes."
+        },
+        {
+          "id": "em-21",
+          "title": "Back for your evening practice 🍃",
+          "body": "No streak to protect. Just start {item} and sit down."
+        },
+        {
+          "id": "em-22",
+          "title": "Missed yesterday? No problem 🌇",
+          "body": "Start {item} today. Nothing to make up for."
+        },
+        {
+          "id": "em-23",
+          "title": "Give it {min} minutes ✨",
+          "body": "That is not much, and it changes the whole evening."
+        },
+        {
+          "id": "em-24",
+          "title": "Stop working right now",
+          "body": "Not forever. Just long enough to start {item}."
+        },
+        {
+          "id": "em-25",
+          "title": "Sit for {item} first 🍃",
+          "body": "Then sit on the sofa. In that order it works better."
+        },
+        {
+          "id": "em-26",
+          "title": "Rest your head and shoulders",
+          "body": "Both worked all day. Give them {min} minutes with {item}."
+        },
+        {
+          "id": "em-27",
+          "title": "Work to rest takes one step 🌿",
+          "body": "Start {item}. That is the step, and it is a short one."
+        },
+        {
+          "id": "em-28",
+          "title": "One quiet thing, then evening 🌿",
+          "body": "Start {item} and the day loosens its grip."
+        },
+        {
+          "id": "em-30",
+          "title": "Home but not settled yet?",
+          "body": "Start {item}. It closes that gap faster than another tea."
+        },
+        {
+          "id": "em-31",
+          "title": "Start your evening on time 🌇",
+          "body": "Take {min} minutes for yourself and call the day done."
+        },
+        {
+          "id": "em-32",
+          "title": "{item} first, then the evening",
+          "body": "Whatever is waiting can wait a little longer."
+        },
+        {
+          "id": "em-33",
+          "title": "Is your head still loud? 🍃",
+          "body": "Start {item} for {min} minutes. That is what it is for."
+        },
+        {
+          "id": "em-34",
+          "title": "Get the workday off you",
+          "body": "It sticks. {min} minutes of {item} peels it away."
+        },
+        {
+          "id": "em-36",
+          "title": "One practice, then the evening 🌿",
+          "body": "Dinner, family, screens. All of it goes easier after."
+        },
+        {
+          "id": "em-37",
+          "title": "Set the day down slowly ✨",
+          "body": "Start {item}. Do not drop the day, and do not carry it either."
+        },
+        {
+          "id": "em-38",
+          "title": "Give {item} the good hour",
+          "body": "Your evening usually gets the leftovers. Change that today."
+        },
+        {
+          "id": "em-39",
+          "title": "Eyes closed, day closed 🌇",
+          "body": "That is how {item} works, and it does not take long."
+        },
+        {
+          "id": "em-40",
+          "title": "Take {item} while it is quiet 🍃",
+          "body": "Start it now, before anyone needs you again."
+        }
+      ]
+    },
+    "evening_soundscape": {
+      "variants": [
+        {
+          "id": "es-01",
+          "title": "Turn the evening down 🌙",
+          "body": "Play {item} under the noise of the house."
+        },
+        {
+          "id": "es-03",
+          "title": "Too much noise around you? 🌊",
+          "body": "Play {item} for {min} minutes and get somewhere quieter."
+        },
+        {
+          "id": "es-04",
+          "title": "Give the evening a soundtrack 🌙",
+          "body": "Play {item} for {min} minutes. Cook, tidy, or just sit."
+        },
+        {
+          "id": "es-07",
+          "title": "Better than one more episode 🍃",
+          "body": "Play {item} for {min} minutes and see how the night goes."
+        },
+        {
+          "id": "es-08",
+          "title": "Change how tonight feels 🍃",
+          "body": "Same house, same hour, plus {min} minutes of {item}."
+        },
+        {
+          "id": "es-09",
+          "title": "Got a quiet moment? Take it 🌿",
+          "body": "Play {item} while you have the chance."
+        },
+        {
+          "id": "es-13",
+          "title": "Ease into the night 🌇",
+          "body": "Play {item} first, sleep later. There is no rush between them."
+        },
+        {
+          "id": "es-15",
+          "title": "You have been on since morning",
+          "body": "Play {item} for {min} minutes and switch off properly."
+        },
+        {
+          "id": "es-16",
+          "title": "Press play and forget it 🌊",
+          "body": "{item} keeps going on its own. Nothing for you to manage."
+        },
+        {
+          "id": "es-18",
+          "title": "Take a slow {min} minutes",
+          "body": "No plan. Put steady sound on and let the hour pass."
+        },
+        {
+          "id": "es-20",
+          "title": "Use the evening properly",
+          "body": "Play {item}. The hours before bed start feeling longer."
+        },
+        {
+          "id": "es-21",
+          "title": "Lights low, sound on 🌌",
+          "body": "Play {item} and the whole evening changes."
+        },
+        {
+          "id": "es-23",
+          "title": "Still going after all day? 🍃",
+          "body": "Let {item} carry the next {min} minutes for you."
+        },
+        {
+          "id": "es-24",
+          "title": "Make the room feel calmer",
+          "body": "That is mostly sound. Play {item} and hear the difference."
+        },
+        {
+          "id": "es-25",
+          "title": "Play {item}, not a reel ✨",
+          "body": "Not a show, not a video. One long, steady track."
+        },
+        {
+          "id": "es-26",
+          "title": "Have the evening you planned 🌙",
+          "body": "Turn one thing off, play {item}, and start the night again."
+        },
+        {
+          "id": "es-27",
+          "title": "Let the house settle 🍃",
+          "body": "Play {item} while everything slows down."
+        },
+        {
+          "id": "es-30",
+          "title": "Get somewhere quieter 🌿",
+          "body": "You do not have to move rooms. Just play {item}."
+        },
+        {
+          "id": "es-31",
+          "title": "Steady sound, steadier evening",
+          "body": "Play {item} for {min} minutes. The body reads it as safe."
+        },
+        {
+          "id": "es-32",
+          "title": "Do less for {min} minutes 🌙",
+          "body": "The evening will not fall apart. Press play on {item}."
+        },
+        {
+          "id": "es-33",
+          "title": "Ready for something slower? 🌙",
+          "body": "Play {item}. A soft landing after a long day."
+        },
+        {
+          "id": "es-34",
+          "title": "Tidy up with {item} on 🍃",
+          "body": "Play it and the last jobs of the day go calmly."
+        },
+        {
+          "id": "es-36",
+          "title": "Play one long, easy track 🌊",
+          "body": "{min} minutes of {item}, and the evening feels yours again."
+        },
+        {
+          "id": "es-39",
+          "title": "Start winding down now 🌙",
+          "body": "{min} minutes of {item} makes sleep easier later."
+        },
+        {
+          "id": "es-40",
+          "title": "Give the room a calmer shape ✨",
+          "body": "Play {item}. A few minutes is enough to feel it."
+        },
+        {
+          "id": "es-41",
+          "title": "Sit down and play {item} 🌙",
+          "body": "Give it {min} minutes off your feet, with sound instead of a screen."
+        },
+        {
+          "id": "es-42",
+          "title": "The day is done. Play {item}",
+          "body": "Nothing left to finish tonight. Just sound and a chair."
+        },
+        {
+          "id": "es-43",
+          "title": "Play {item} before bed 🌙",
+          "body": "Not sleep yet. Just the hour before it, made quieter."
+        },
+        {
+          "id": "es-44",
+          "title": "Listen to {item} tonight 🌊",
+          "body": "Give it {min} minutes and keep the rest of the evening."
+        },
+        {
+          "id": "es-45",
+          "title": "Too tired to decide? 🍃",
+          "body": "Play {item}. It asks nothing of you and it still works."
+        }
+      ]
+    },
+    "night_nidra": {
+      "variants": [
+        {
+          "id": "nn-01",
+          "title": "Let today go now 🌙",
+          "body": "Start {item}. It asks nothing from you."
+        },
+        {
+          "id": "nn-02",
+          "title": "Lights off, eyes closed 🌙",
+          "body": "Start {item} and let the voice take over from here."
+        },
+        {
+          "id": "nn-04",
+          "title": "You got through the day 🌌",
+          "body": "That is enough. Lie down and start {item}."
+        },
+        {
+          "id": "nn-05",
+          "title": "Leave the rest for tomorrow",
+          "body": "Whatever is unfinished can sleep too. Open {item}."
+        },
+        {
+          "id": "nn-06",
+          "title": "Stop trying to sleep 🌙",
+          "body": "Just start {item} and let sleep come on its own."
+        },
+        {
+          "id": "nn-07",
+          "title": "Go into the night slowly 🌌",
+          "body": "Start {item}. The voice guides and the body follows."
+        },
+        {
+          "id": "nn-08",
+          "title": "Long day, soft landing ✨",
+          "body": "Start {item}. It runs {min} minutes, so you can drift off partway."
+        },
+        {
+          "id": "nn-09",
+          "title": "Put the phone down 🌙",
+          "body": "Then lie back and start {item}. Last thing you need tonight."
+        },
+        {
+          "id": "nn-10",
+          "title": "Is your head still running? 🌌",
+          "body": "It slows later than the body. Start {item} for {min} minutes."
+        },
+        {
+          "id": "nn-11",
+          "title": "Start {item} tonight 🌙",
+          "body": "Slow and steady, and long enough to carry you all the way down."
+        },
+        {
+          "id": "nn-12",
+          "title": "Sleep cannot be forced ✨",
+          "body": "A slow voice does far more than trying harder. Start {item}."
+        },
+        {
+          "id": "nn-13",
+          "title": "The house is quiet now 🌙",
+          "body": "So is {item}. Press play and let the night close in."
+        },
+        {
+          "id": "nn-14",
+          "title": "Rest your attention somewhere",
+          "body": "That is all {item} is, for {min} slow minutes."
+        },
+        {
+          "id": "nn-15",
+          "title": "You are not doing this alone 🌌",
+          "body": "A voice, a slow count, and {min} minutes of company."
+        },
+        {
+          "id": "nn-16",
+          "title": "Start {item} and lie still 🌌",
+          "body": "Let tomorrow be tomorrow. Tonight you only have to listen."
+        },
+        {
+          "id": "nn-17",
+          "title": "Breathe out once, slowly ✨",
+          "body": "That is where {item} starts. Everything after it gets slower."
+        },
+        {
+          "id": "nn-18",
+          "title": "Back to your night practice 🌙",
+          "body": "No score, no catching up. Just start {item} tonight."
+        },
+        {
+          "id": "nn-19",
+          "title": "{item} has not changed 🌙",
+          "body": "Missed last night? Start it now, exactly as it was."
+        },
+        {
+          "id": "nn-20",
+          "title": "Sleep better tonight 🌌",
+          "body": "Start {item} for {min} minutes, lying still, following along."
+        },
+        {
+          "id": "nn-21",
+          "title": "{item} clears the way",
+          "body": "Your body knows how to sleep. This only makes room for it."
+        },
+        {
+          "id": "nn-22",
+          "title": "Stop thinking for {min} minutes 🌙",
+          "body": "Start {item}. Someone else does the talking now."
+        },
+        {
+          "id": "nn-23",
+          "title": "Slow, dark and quiet ✨",
+          "body": "Three things sleep likes. Start {item} for the third one."
+        },
+        {
+          "id": "nn-24",
+          "title": "Feeling restless tonight? 🌌",
+          "body": "Stop pushing. Start {item}, it is made for exactly this."
+        },
+        {
+          "id": "nn-25",
+          "title": "Let {item} finish the night",
+          "body": "The day is done with you. {min} minutes, eyes closed."
+        },
+        {
+          "id": "nn-26",
+          "title": "You can stop for today 🌙",
+          "body": "Start {item}. Everything else begins again tomorrow."
+        },
+        {
+          "id": "nn-28",
+          "title": "Get comfortable, press play 🌌",
+          "body": "Pillow, dark room, {item}. Nothing else to arrange."
+        },
+        {
+          "id": "nn-29",
+          "title": "Make tonight gentler 🌙",
+          "body": "Start {item} for {min} minutes before you try to sleep."
+        },
+        {
+          "id": "nn-31",
+          "title": "The last thing for today 🌙",
+          "body": "Start {item}, and then nothing at all."
+        },
+        {
+          "id": "nn-32",
+          "title": "Eyes getting heavy? Good ✨",
+          "body": "Do not fight it. Start {item} and you are done for today."
+        },
+        {
+          "id": "nn-33",
+          "title": "Quiet first, then sleep 🌌",
+          "body": "The order matters, and {item} handles the first part."
+        },
+        {
+          "id": "nn-34",
+          "title": "A soft end to a hard day 🌙",
+          "body": "Start {item}. It only asks you to lie still."
+        },
+        {
+          "id": "nn-35",
+          "title": "Comfortable? Start {item}",
+          "body": "{min} minutes, and the night takes over."
+        },
+        {
+          "id": "nn-36",
+          "title": "That is enough for today 🌙",
+          "body": "Lie back and start {item}. Let the night have the rest."
+        },
+        {
+          "id": "nn-37",
+          "title": "Slow your breathing down ✨",
+          "body": "Start {item}. A long breath out tells the body to stand down."
+        },
+        {
+          "id": "nn-38",
+          "title": "Nothing more to do tonight 🌌",
+          "body": "Not one more task. Start {item}, then sleep."
+        },
+        {
+          "id": "nn-39",
+          "title": "Finish today with {item} 🌌",
+          "body": "Lights off, nothing else running."
+        },
+        {
+          "id": "nn-40",
+          "title": "Sleep will come 🌙",
+          "body": "Give your mind somewhere quiet to go. Start {item} now."
+        }
+      ]
+    }
+  }
+}

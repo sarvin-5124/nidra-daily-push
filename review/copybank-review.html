@@ -1,0 +1,3552 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nidra Push Copy Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,500;1,6..72,300&family=Karla:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style id="css">/* Nidra push copy bank — sign-off sheet.
+   Deliberately single-theme: this is copy that will be read on a lit screen in a
+   dark room, and the review should happen in the same light. Every colour is
+   painted explicitly so the page holds on either host ground. */
+:root {
+  --ground: #0d0b12;
+  --surface: #161320;
+  --raised: #1e1a2b;
+  --hairline: #2a2438;
+  --text: #efecf7;
+  --dim: #a9a2c0;
+  --faint: #6d6689;
+  --moon: #8a6fd6;
+  --gold: #e0b64c;
+  --good: #37c97f;
+  --bad: #e0655c;
+  --display: "Newsreader", Georgia, "Times New Roman", serif;
+  --ui: "Karla", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  /* The previews use the host's own UI face on purpose — a phone renders them in
+     SF or Roboto, not in our brand type. */
+  --device: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --hue: var(--moon);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--ui);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+body > header,
+body > section,
+body > nav,
+body > footer { max-width: 62rem; margin-inline: auto; padding-inline: clamp(1rem, 4vw, 2.5rem); }
+
+a { color: var(--moon); }
+code { font-family: var(--mono); font-size: 0.86em; }
+
+/* ── page head ─────────────────────────────────────────────────────────── */
+.page-head { padding-top: clamp(2.5rem, 7vw, 5rem); padding-bottom: 2rem; }
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 0 0 1.5rem;
+}
+.page-head h1 {
+  font-family: var(--display);
+  font-weight: 300;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  margin: 0 0 1.5rem;
+}
+.lede { max-width: 56ch; color: var(--dim); font-size: 1.02rem; margin: 0 0 1rem; }
+.lede:last-child { margin-bottom: 0; }
+
+/* ── sticky bar ────────────────────────────────────────────────────────── */
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding-block: 0.85rem;
+  margin-bottom: 1rem;
+  background: rgba(13, 11, 18, 0.94);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--hairline);
+  max-width: none;
+}
+.chip {
+  font-family: var(--ui);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--dim);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.chip:hover { color: var(--text); border-color: var(--faint); }
+.chip.is-on { color: var(--ground); background: var(--moon); border-color: var(--moon); font-weight: 700; }
+.chip.reset { margin-left: 0.25rem; color: var(--faint); }
+.chip.reset:hover { color: var(--bad); border-color: var(--bad); }
+.chip:focus-visible, select:focus-visible, .btn:focus-visible { outline: 2px solid var(--moon); outline-offset: 2px; }
+.tally { font-family: var(--mono); font-size: 0.78rem; color: var(--faint); margin-left: auto; font-variant-numeric: tabular-nums; }
+.tally b { font-weight: 500; color: var(--dim); }
+.tally .n-acc { color: var(--good); }
+.tally .n-rej { color: var(--bad); }
+
+/* ── slot sections ─────────────────────────────────────────────────────── */
+.slot {
+  padding: 2.5rem clamp(1rem, 4vw, 2.5rem) 1rem;
+  border-top: 1px solid var(--hairline);
+}
+.slot.is-empty { display: none; }
+.slot-head { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: baseline; margin-bottom: 1.5rem; }
+.slot-id { display: flex; flex-direction: column; gap: 0.3rem; min-width: 9rem; }
+.slot-time {
+  font-family: var(--display);
+  font-size: clamp(2.2rem, 6vw, 3rem);
+  font-weight: 300;
+  line-height: 0.9;
+  color: var(--hue);
+  font-variant-numeric: tabular-nums;
+}
+.slot-key { color: var(--faint); font-size: 0.78rem; }
+.slot-about { flex: 1 1 20rem; }
+.slot-about h2 { font-family: var(--display); font-weight: 500; font-size: 1.35rem; margin: 0 0 0.3rem; }
+.slot-about p { margin: 0; color: var(--dim); font-size: 0.94rem; max-width: 52ch; }
+.picker { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.8rem; color: var(--faint); }
+select {
+  font-family: var(--ui);
+  font-size: 0.85rem;
+  color: var(--text);
+  background: var(--raised);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+}
+
+/* ── cards ─────────────────────────────────────────────────────────────── */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); gap: 1rem; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  padding: 0.85rem 0.95rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  scroll-margin-top: 5rem;
+}
+.card.is-hidden { display: none; }
+.card.accepted { border-color: rgba(55, 201, 127, 0.45); }
+.card.rejected { border-color: rgba(224, 101, 92, 0.35); opacity: 0.55; }
+.card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; }
+.vid { color: var(--hue); font-size: 0.78rem; font-weight: 500; }
+.state {
+  font-family: var(--ui);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.card.accepted .state { color: var(--good); }
+.card.rejected .state { color: var(--bad); }
+
+.notif {
+  display: flex;
+  gap: 0.7rem;
+  background: linear-gradient(160deg, #241f33, #17131f);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  padding: 0.7rem 0.75rem;
+  font-family: var(--device);
+}
+.notif-icon {
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  border-radius: 8px;
+  background: radial-gradient(circle at 32% 30%, #d9c7f5, #8a6fd6 55%, #4a3a78);
+}
+.notif-text { display: flex; flex-direction: column; min-width: 0; }
+.notif-app { font-size: 0.63rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--faint); }
+.notif-title { font-size: 0.92rem; font-weight: 600; line-height: 1.3; margin-top: 0.1rem; }
+.notif-body { font-size: 0.87rem; color: var(--dim); line-height: 1.4; margin-top: 0.1rem; }
+
+.tok {
+  font-family: var(--mono);
+  font-size: 0.78em;
+  color: var(--moon);
+  background: rgba(138, 111, 214, 0.14);
+  border: 1px solid rgba(138, 111, 214, 0.3);
+  border-radius: 4px;
+  padding: 0 0.3em;
+}
+.subbed { color: var(--gold); }
+
+.verdict { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.btn {
+  font-family: var(--ui);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--dim);
+  background: var(--raised);
+  border: 1px solid var(--hairline);
+  border-radius: 9px;
+  padding: 0.4rem 0.5rem;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.btn:hover { color: var(--text); }
+.btn.accept:hover { border-color: var(--good); color: var(--good); }
+.btn.reject:hover { border-color: var(--bad); color: var(--bad); }
+.btn[aria-pressed="true"].accept { background: var(--good); border-color: var(--good); color: #08150e; }
+.btn[aria-pressed="true"].reject { background: var(--bad); border-color: var(--bad); color: #1c0806; }
+
+/* ── decisions ─────────────────────────────────────────────────────────── */
+.export { padding: 3rem clamp(1rem, 4vw, 2.5rem) 1rem; border-top: 1px solid var(--hairline); }
+.export h2 { font-family: var(--display); font-weight: 300; font-size: clamp(1.4rem, 3.5vw, 1.9rem); margin: 0 0 0.5rem; }
+.export > p { color: var(--dim); font-size: 0.94rem; max-width: 58ch; margin: 0 0 1.5rem; }
+.lists { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; }
+.lists h3 {
+  font-family: var(--ui);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--moon);
+  margin: 0 0 0.5rem;
+}
+.lists h3 span { font-family: var(--mono); color: var(--faint); letter-spacing: 0; }
+.lists pre {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  line-height: 1.7;
+  color: var(--dim);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── shared by the history sections ───────────────────────────────────── */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+  gap: 1px;
+  margin: 2.5rem 0 0;
+  background: var(--hairline);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.stats > div { background: var(--surface); padding: 0.9rem 1rem; }
+.stats dt {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.stats dd {
+  margin: 0.15rem 0 0;
+  font-family: var(--display);
+  font-size: 1.85rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.stats code { color: var(--moon); font-size: 0.78em; }
+.flag-tag {
+  display: inline-block;
+  margin-left: 0.6rem;
+  font-family: var(--ui);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid rgba(224, 182, 76, 0.35);
+  background: rgba(224, 182, 76, 0.1);
+  border-radius: 999px;
+  padding: 0.1rem 0.55rem;
+  vertical-align: 1px;
+}
+
+/* ── send history ──────────────────────────────────────────────────────── */
+.history { padding-block: 1rem 3rem; }
+.history h2 {
+  font-family: var(--display);
+  font-weight: 300;
+  font-size: clamp(1.5rem, 3.5vw, 2.1rem);
+  margin: 0 0 0.75rem;
+}
+.history h3 {
+  font-family: var(--ui);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--moon);
+  margin: 2.5rem 0 1rem;
+}
+.history > p { max-width: 62ch; color: var(--dim); margin: 0 0 1.75rem; }
+.history .note { font-size: 0.86rem; color: var(--faint); max-width: 62ch; margin: 0.9rem 0 0; }
+
+.clock { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.35rem; }
+.clock li {
+  display: grid;
+  grid-template-columns: 3.6rem minmax(0, 1fr) 1.6rem 8.5rem;
+  gap: 0.75rem;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--dim);
+}
+.clock .hr { font-family: var(--mono); font-size: 0.78rem; color: var(--faint); font-variant-numeric: tabular-nums; }
+.clock .bar { height: 6px; border-radius: 3px; background: var(--hairline); position: relative; }
+.clock .bar::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--w);
+  background: var(--moon);
+  border-radius: 3px;
+}
+.clock b { font-family: var(--mono); font-size: 0.78rem; color: var(--faint); text-align: right; font-variant-numeric: tabular-nums; }
+.clock .ours {
+  font-family: var(--ui);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid rgba(224, 182, 76, 0.35);
+  background: rgba(224, 182, 76, 0.1);
+  border-radius: 999px;
+  padding: 0.1rem 0.55rem;
+  justify-self: start;
+}
+.clock li.is-ours .bar::after { background: var(--gold); }
+
+.tablewrap { overflow-x: auto; border: 1px solid var(--hairline); border-radius: 12px; }
+table.diverge { border-collapse: collapse; width: 100%; min-width: 34rem; font-size: 0.88rem; }
+table.diverge th, table.diverge td { text-align: left; padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--hairline); }
+table.diverge thead th {
+  font-family: var(--ui);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  background: var(--surface);
+  white-space: nowrap;
+}
+table.diverge tbody th { font-weight: 500; color: var(--text); }
+table.diverge td { color: var(--dim); font-variant-numeric: tabular-nums; }
+table.diverge td.now { color: var(--text); }
+table.diverge tbody tr:last-child th, table.diverge tbody tr:last-child td { border-bottom: 0; }
+table.diverge tbody tr:hover th, table.diverge tbody tr:hover td { background: var(--surface); }
+
+.calls { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; background: var(--hairline); border: 1px solid var(--hairline); border-radius: 12px; overflow: hidden; }
+.calls li { background: var(--surface); padding: 1rem 1.1rem; }
+.calls h4 { font-family: var(--ui); font-size: 0.95rem; font-weight: 700; margin: 0.5rem 0 0; }
+.calls p { margin: 0.3rem 0 0; color: var(--dim); font-size: 0.92rem; max-width: 66ch; }
+.calls .flag-tag { margin-left: 0; }
+.calls .fixed { color: var(--good); border-color: rgba(55, 201, 127, 0.35); background: rgba(55, 201, 127, 0.1); }
+
+/* ── what actually ships: the 41 real sends ────────────────────────────── */
+.kinds { padding-block: 1rem 3rem; }
+.kinds h2 {
+  font-family: var(--display);
+  font-weight: 300;
+  font-size: clamp(1.5rem, 3.5vw, 2.1rem);
+  margin: 0 0 0.75rem;
+}
+.kinds > p { max-width: 62ch; color: var(--dim); margin: 0 0 2rem; }
+.kinds > p.note { font-size: 0.86rem; color: var(--faint); margin-top: 1rem; }
+
+.kind { padding-top: 2.25rem; }
+.kind-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 1rem; margin-bottom: 1rem; }
+.kind-head h3 {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 1.3rem;
+  margin: 0;
+  color: var(--text);
+}
+.kind-n { font-family: var(--mono); font-size: 0.78rem; color: var(--faint); }
+.kind-slot {
+  font-family: var(--ui);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--moon);
+  border: 1px solid rgba(138, 111, 214, 0.35);
+  background: rgba(138, 111, 214, 0.12);
+  border-radius: 999px;
+  padding: 0.1rem 0.55rem;
+}
+.kind-slot.none { color: var(--gold); border-color: rgba(224, 182, 76, 0.35); background: rgba(224, 182, 76, 0.1); }
+.kind > p { margin: 0 0 1.25rem; color: var(--dim); font-size: 0.94rem; max-width: 62ch; }
+
+.card.real { gap: 0.6rem; }
+.card.real .when { font-family: var(--mono); font-size: 0.78rem; color: var(--hue); }
+.card.real .deliv { font-family: var(--mono); font-size: 0.7rem; color: var(--faint); font-variant-numeric: tabular-nums; }
+.card.real .deliv b { color: var(--dim); font-weight: 500; }
+.card.real .marks { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.mark {
+  font-family: var(--ui);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--faint);
+  border: 1px solid var(--hairline);
+  background: var(--raised);
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+}
+.mark.img { color: var(--moon); border-color: rgba(138, 111, 214, 0.3); }
+.mark.warn { color: var(--gold); border-color: rgba(224, 182, 76, 0.35); }
+
+.shapes { list-style: none; margin: 1.25rem 0 0; padding: 0; display: grid; gap: 1px; background: var(--hairline); border: 1px solid var(--hairline); border-radius: 12px; overflow: hidden; }
+.shapes li { background: var(--surface); padding: 0.9rem 1.1rem; display: grid; gap: 0.3rem; }
+.shapes .shape-name { font-family: var(--ui); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--moon); }
+.shapes .shape-name span { color: var(--faint); letter-spacing: 0; text-transform: none; font-weight: 400; }
+.shapes q { font-family: var(--device); font-size: 0.95rem; color: var(--text); quotes: none; }
+.shapes p { margin: 0; color: var(--dim); font-size: 0.88rem; max-width: 66ch; }
+
+.verbs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.25rem 0 0; padding: 0; list-style: none; }
+.verbs li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.86rem;
+  color: var(--dim);
+}
+.verbs b { font-family: var(--mono); font-size: 0.78rem; color: var(--moon); font-variant-numeric: tabular-nums; }
+
+/* ── foot ──────────────────────────────────────────────────────────────── */
+.page-foot { padding: 3rem clamp(1rem, 4vw, 2.5rem) 4rem; border-top: 1px solid var(--hairline); margin-top: 2.5rem; }
+.page-foot p { margin: 0; color: var(--faint); font-size: 0.88rem; max-width: 62ch; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* ── saving ────────────────────────────────────────────────────────────── */
+.bar .btn.save {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  color: var(--ground);
+  background: var(--good);
+  border-color: var(--good);
+}
+.bar .btn.save:disabled { color: var(--faint); background: var(--surface); border-color: var(--hairline); cursor: default; }
+.bar .btn.save:not(:disabled):hover { filter: brightness(1.08); }
+.save-line {
+  max-width: 62rem;
+  margin: -0.25rem auto 0;
+  padding-inline: clamp(1rem, 4vw, 2.5rem);
+  font-size: 0.82rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.save-status { color: var(--dim); }
+.save-status.is-ok { color: var(--good); }
+.save-status.is-warn { color: var(--gold); }
+.saved-at { color: var(--faint); font-family: var(--mono); font-size: 0.76rem; }
+.card.is-dirty .vid::after {
+  content: "unsaved";
+  margin-left: 0.5rem;
+  font-family: var(--ui);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.out-report {
+  margin: 1rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  line-height: 1.7;
+  color: var(--text);
+  background: var(--raised);
+  border: 1px solid var(--gold);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+</style>
+</head>
+<body>
+<script id="bank" type="application/json">{
+  "slots": [
+    {
+      "key": "morning_focus",
+      "at": "10:00",
+      "hue": "#7b95d6",
+      "name": "Mid-morning reset",
+      "about": "The workday is underway and attention is already going. Short, energising, clarity-led — not sleep.",
+      "items": [
+        [
+          "Focus Breathing",
+          4
+        ],
+        [
+          "Yog Nidra",
+          13
+        ]
+      ],
+      "variants": [
+        {
+          "id": "mf-01",
+          "title": "Take a break right now 🌄",
+          "body": "Start {item}. Your mind has been going since morning."
+        },
+        {
+          "id": "mf-02",
+          "title": "Stop for {min} minutes",
+          "body": "Open {item}, close your eyes, and let your mind settle."
+        },
+        {
+          "id": "mf-03",
+          "title": "Start {item} now 🌿",
+          "body": "You have been at it all morning. Your mind needs a rest."
+        },
+        {
+          "id": "mf-04",
+          "title": "Your mind needs a break",
+          "body": "Not later. Now. Start {item} and give it your attention."
+        },
+        {
+          "id": "mf-05",
+          "title": "Close your eyes for {min} minutes ✨",
+          "body": "Start {item} and let your head go quiet for a while."
+        },
+        {
+          "id": "mf-06",
+          "title": "Sit back and press play 🍃",
+          "body": "{item} is ready. Give it your attention and you will think clearer."
+        },
+        {
+          "id": "mf-07",
+          "title": "Feeling scattered? Fix it now",
+          "body": "Start {item} and come back to your desk sharper."
+        },
+        {
+          "id": "mf-08",
+          "title": "{item} is ready for you 🌿",
+          "body": "Take the time now. The rest of the work gets easier."
+        },
+        {
+          "id": "mf-09",
+          "title": "Give yourself {min} minutes",
+          "body": "That is it. Start {item} and do nothing else."
+        },
+        {
+          "id": "mf-10",
+          "title": "Drop everything for a bit 🌄",
+          "body": "Your list will still be there. Start {item} first."
+        },
+        {
+          "id": "mf-11",
+          "title": "Try {item}, not more coffee",
+          "body": "It clears your head without the crash that comes after."
+        },
+        {
+          "id": "mf-12",
+          "title": "Clear your head now 🍃",
+          "body": "Start {item}. Short, simple, and it works."
+        },
+        {
+          "id": "mf-13",
+          "title": "How is your focus right now?",
+          "body": "If it is slipping, start {item} for {min} minutes."
+        },
+        {
+          "id": "mf-14",
+          "title": "Pause before your next task 🌿",
+          "body": "Start {item}. You will begin the next one in a better state."
+        },
+        {
+          "id": "mf-16",
+          "title": "Do this before your inbox ✨",
+          "body": "Open {item} and take a few quiet minutes for yourself."
+        },
+        {
+          "id": "mf-18",
+          "title": "Do one small thing now 🌿",
+          "body": "Start {item}. Nothing hard, nothing to learn. Just follow along."
+        },
+        {
+          "id": "mf-20",
+          "title": "Shut your eyes and listen 🍃",
+          "body": "Start {item}. The noise in your head drops away."
+        },
+        {
+          "id": "mf-21",
+          "title": "Same practice, same time 🍃",
+          "body": "Start {item} today as well. That is how the habit sticks."
+        },
+        {
+          "id": "mf-22",
+          "title": "{item} is still waiting",
+          "body": "Been a few days? Start it now, with no catching up to do."
+        },
+        {
+          "id": "mf-23",
+          "title": "Begin again today 🌄",
+          "body": "Start {item} right now. One session, nothing more."
+        },
+        {
+          "id": "mf-25",
+          "title": "Take one deep breath ✨",
+          "body": "Now take {min} more minutes with {item}. That is the whole thing."
+        },
+        {
+          "id": "mf-27",
+          "title": "Put your headphones on 🌿",
+          "body": "Start {item} and let the room go quiet for {min} minutes."
+        },
+        {
+          "id": "mf-28",
+          "title": "Get your energy back",
+          "body": "Start {item}. Calm energy lasts longer than forcing it."
+        },
+        {
+          "id": "mf-30",
+          "title": "Start {item} and follow along 🍃",
+          "body": "Do nothing else for the whole session. That is the only instruction."
+        },
+        {
+          "id": "mf-31",
+          "title": "Train your focus today ✨",
+          "body": "Start {item} for {min} minutes. Focus improves with practice."
+        },
+        {
+          "id": "mf-32",
+          "title": "Too many things at once?",
+          "body": "Start {item}. It gives your mind one thing to hold."
+        },
+        {
+          "id": "mf-34",
+          "title": "Try {min} minutes today",
+          "body": "Less time than you spend on your phone, and your head feels lighter."
+        },
+        {
+          "id": "mf-35",
+          "title": "Make room for {item} 🌿",
+          "body": "Start it whenever the morning begins to feel heavy."
+        },
+        {
+          "id": "mf-36",
+          "title": "You do not have to earn rest",
+          "body": "Take the break now. Start {item} and sit quietly."
+        },
+        {
+          "id": "mf-37",
+          "title": "Your to-do list can wait 🌄",
+          "body": "It will not grow while you rest. Start {item} first."
+        },
+        {
+          "id": "mf-38",
+          "title": "Calm mind, better work ✨",
+          "body": "Start {item} for {min} minutes and see the difference today."
+        },
+        {
+          "id": "mf-39",
+          "title": "Just {min} minutes, nothing more 🌿",
+          "body": "Press play on {item} and follow along. That is all."
+        },
+        {
+          "id": "mf-40",
+          "title": "Start {item} today 🍃",
+          "body": "Take {min} minutes now. You will be glad an hour later."
+        }
+      ]
+    },
+    {
+      "key": "afternoon_soundscape",
+      "at": "14:00",
+      "hue": "#c9a463",
+      "name": "After-lunch dip",
+      "about": "Background sound for work, or a real pause. Light, sensory, unhurried.",
+      "items": [
+        [
+          "Escape",
+          20
+        ],
+        [
+          "Om",
+          20
+        ],
+        [
+          "Rain",
+          20
+        ],
+        [
+          "Waves",
+          20
+        ],
+        [
+          "Thunder",
+          20
+        ]
+      ],
+      "variants": [
+        {
+          "id": "as-03",
+          "title": "{min} minutes of {item} 🌊",
+          "body": "Finish a task with it on, or sit and do nothing at all."
+        },
+        {
+          "id": "as-04",
+          "title": "Stop scrolling, play sound 🍃",
+          "body": "One of them actually rests you. The other only looks like it."
+        },
+        {
+          "id": "as-05",
+          "title": "Turn the afternoon down",
+          "body": "Put {item} on low and keep going with your work."
+        },
+        {
+          "id": "as-06",
+          "title": "Take the full {min} minutes ✨",
+          "body": "You do not have to explain a break. Play {item} and rest."
+        },
+        {
+          "id": "as-07",
+          "title": "Pick {item} and press play",
+          "body": "Let it run, and the room around you changes."
+        },
+        {
+          "id": "as-08",
+          "title": "Close your tabs for a bit 🌿",
+          "body": "Play {item}. For a while, nothing else needs you."
+        },
+        {
+          "id": "as-11",
+          "title": "Hear what {item} sounds like 🍃",
+          "body": "Give it {min} minutes, then get back to your day."
+        },
+        {
+          "id": "as-12",
+          "title": "Make the afternoon quieter 🌿",
+          "body": "Play {item}. Steady sound lowers the volume of everything else."
+        },
+        {
+          "id": "as-15",
+          "title": "Work with {item} playing",
+          "body": "Many people focus better with steady sound behind them. Try it."
+        },
+        {
+          "id": "as-16",
+          "title": "Put something steady on 🌊",
+          "body": "{min} minutes of {item}, and the day feels less sharp."
+        },
+        {
+          "id": "as-17",
+          "title": "Give {item} a few minutes",
+          "body": "The same time you would spend checking your phone again."
+        },
+        {
+          "id": "as-18",
+          "title": "Rest is not laziness 🍃",
+          "body": "A short break in the middle of the day is a sensible thing to do."
+        },
+        {
+          "id": "as-19",
+          "title": "Let the room go soft 🌿",
+          "body": "Play {item}. It does the work. You only press play."
+        },
+        {
+          "id": "as-20",
+          "title": "Reset the second half of today",
+          "body": "Play {item} now. Pushing through works much worse."
+        },
+        {
+          "id": "as-21",
+          "title": "Open {item} and let it run ✨",
+          "body": "Give it {min} minutes and feel the afternoon slow down."
+        },
+        {
+          "id": "as-22",
+          "title": "Noisy head? Play quiet sound 🌊",
+          "body": "Sometimes it is that simple. One track, {min} minutes."
+        },
+        {
+          "id": "as-23",
+          "title": "Take the next hour lighter",
+          "body": "Work can wait. {item} is one tap away."
+        },
+        {
+          "id": "as-24",
+          "title": "Go somewhere else for a while ✨",
+          "body": "Play {item}. Quickest way out of a room you have sat in all day."
+        },
+        {
+          "id": "as-25",
+          "title": "Half listening is fine 🍃",
+          "body": "Leave {item} playing while you work. It still calms you down."
+        },
+        {
+          "id": "as-26",
+          "title": "Make the rest of today easier",
+          "body": "Play {item} now, and the afternoon eases up on its own."
+        },
+        {
+          "id": "as-27",
+          "title": "Close your eyes for a bit 🌿",
+          "body": "You have stared at screens all day. Let {item} take over."
+        },
+        {
+          "id": "as-28",
+          "title": "Nothing to follow here 🌊",
+          "body": "No voice, no instructions. Just {item} for {min} minutes."
+        },
+        {
+          "id": "as-29",
+          "title": "{item} is still where you left it",
+          "body": "Come back for another listen whenever you want."
+        },
+        {
+          "id": "as-30",
+          "title": "Play {item} for the slow hour",
+          "body": "Give it a few minutes. It changes the mood of a room."
+        },
+        {
+          "id": "as-31",
+          "title": "Take {min} unhurried minutes 🌿",
+          "body": "No goal, no tracking, no follow-up. Just press play."
+        },
+        {
+          "id": "as-32",
+          "title": "Would a break help right now?",
+          "body": "It usually does. Play {item} whenever you are ready."
+        },
+        {
+          "id": "as-33",
+          "title": "Afternoon feeling long? 🌊",
+          "body": "It gets shorter after {min} minutes of {item}."
+        },
+        {
+          "id": "as-35",
+          "title": "Slow sound, slower breathing ✨",
+          "body": "Put {item} on. Your breath gets longer without you trying."
+        },
+        {
+          "id": "as-36",
+          "title": "These minutes are yours 🍃",
+          "body": "Spend them on {item}, or on looking out of a window."
+        },
+        {
+          "id": "as-37",
+          "title": "Press play and look away",
+          "body": "This one asks nothing from your eyes. Let {item} run."
+        },
+        {
+          "id": "as-38",
+          "title": "One track, {min} minutes 🌊",
+          "body": "That is the whole plan. Everything else can wait."
+        },
+        {
+          "id": "as-39",
+          "title": "Put space between you and work 🌿",
+          "body": "Play {item} for {min} minutes. Come back to the desk after."
+        },
+        {
+          "id": "as-40",
+          "title": "Running low on energy?",
+          "body": "Play {item}. You will feel steadier after, not sleepier."
+        }
+      ]
+    },
+    {
+      "key": "evening_meditation",
+      "at": "17:00",
+      "hue": "#d1854a",
+      "name": "Work-to-evening handoff",
+      "about": "Putting the workday down. Not sleeping yet.",
+      "items": [
+        [
+          "Wind Down",
+          3
+        ],
+        [
+          "Focus Breathing",
+          4
+        ],
+        [
+          "Yog Nidra",
+          13
+        ]
+      ],
+      "variants": [
+        {
+          "id": "em-03",
+          "title": "Put the day down with {item} 🌇",
+          "body": "Start it now and leave the work where it is."
+        },
+        {
+          "id": "em-04",
+          "title": "Still thinking about that meeting?",
+          "body": "Most of us are. Start {item} and set it down."
+        },
+        {
+          "id": "em-05",
+          "title": "Do this before your evening starts ✨",
+          "body": "Start {item} now, and you will actually be present at home."
+        },
+        {
+          "id": "em-06",
+          "title": "Relax your jaw and shoulders 🍃",
+          "body": "Both have been tight since afternoon. Start {item} for {min} minutes."
+        },
+        {
+          "id": "em-07",
+          "title": "Leave the work stress here 🌿",
+          "body": "The tasks wait for tomorrow. Your shoulders should not have to."
+        },
+        {
+          "id": "em-08",
+          "title": "End the day properly",
+          "body": "Start {item}. {min} minutes, and the workday is closed."
+        },
+        {
+          "id": "em-09",
+          "title": "{item} before dinner 🌇",
+          "body": "Food tastes better when your head is not still at work."
+        },
+        {
+          "id": "em-10",
+          "title": "Work not over? Rest anyway",
+          "body": "Start {item} for {min} minutes. You have earned the pause."
+        },
+        {
+          "id": "em-11",
+          "title": "Long day, put it down 🌿",
+          "body": "{min} minutes of {item} and you can stop carrying it."
+        },
+        {
+          "id": "em-12",
+          "title": "Breathe out slowly 🌿",
+          "body": "Start {item}. A long breath out tells the body to relax."
+        },
+        {
+          "id": "em-13",
+          "title": "Change gear before you go home ✨",
+          "body": "Work straight into family rarely goes well. Start {item} first."
+        },
+        {
+          "id": "em-14",
+          "title": "Press play on {item} 🍃",
+          "body": "Give it {min} minutes. After that, the evening is yours."
+        },
+        {
+          "id": "em-15",
+          "title": "{item} fits right now",
+          "body": "A small window, and enough for one practice."
+        },
+        {
+          "id": "em-16",
+          "title": "You showed up all day ✨",
+          "body": "Now show up for a few quiet minutes. Then stop working."
+        },
+        {
+          "id": "em-17",
+          "title": "The evening can wait for {item} 🌇",
+          "body": "Start it first. Everything else begins after that."
+        },
+        {
+          "id": "em-19",
+          "title": "Turn the noise down 🌿",
+          "body": "Start {item}. It clears what you have carried since morning."
+        },
+        {
+          "id": "em-20",
+          "title": "Tired but still restless?",
+          "body": "Very common at this hour. Start {item} for {min} minutes."
+        },
+        {
+          "id": "em-21",
+          "title": "Back for your evening practice 🍃",
+          "body": "No streak to protect. Just start {item} and sit down."
+        },
+        {
+          "id": "em-22",
+          "title": "Missed yesterday? No problem 🌇",
+          "body": "Start {item} today. Nothing to make up for."
+        },
+        {
+          "id": "em-23",
+          "title": "Give it {min} minutes ✨",
+          "body": "That is not much, and it changes the whole evening."
+        },
+        {
+          "id": "em-24",
+          "title": "Stop working right now",
+          "body": "Not forever. Just long enough to start {item}."
+        },
+        {
+          "id": "em-25",
+          "title": "Sit for {item} first 🍃",
+          "body": "Then sit on the sofa. In that order it works better."
+        },
+        {
+          "id": "em-26",
+          "title": "Rest your head and shoulders",
+          "body": "Both worked all day. Give them {min} minutes with {item}."
+        },
+        {
+          "id": "em-27",
+          "title": "Work to rest takes one step 🌿",
+          "body": "Start {item}. That is the step, and it is a short one."
+        },
+        {
+          "id": "em-28",
+          "title": "One quiet thing, then evening 🌿",
+          "body": "Start {item} and the day loosens its grip."
+        },
+        {
+          "id": "em-30",
+          "title": "Home but not settled yet?",
+          "body": "Start {item}. It closes that gap faster than another tea."
+        },
+        {
+          "id": "em-31",
+          "title": "Start your evening on time 🌇",
+          "body": "Take {min} minutes for yourself and call the day done."
+        },
+        {
+          "id": "em-32",
+          "title": "{item} first, then the evening",
+          "body": "Whatever is waiting can wait a little longer."
+        },
+        {
+          "id": "em-33",
+          "title": "Is your head still loud? 🍃",
+          "body": "Start {item} for {min} minutes. That is what it is for."
+        },
+        {
+          "id": "em-34",
+          "title": "Get the workday off you",
+          "body": "It sticks. {min} minutes of {item} peels it away."
+        },
+        {
+          "id": "em-36",
+          "title": "One practice, then the evening 🌿",
+          "body": "Dinner, family, screens. All of it goes easier after."
+        },
+        {
+          "id": "em-37",
+          "title": "Set the day down slowly ✨",
+          "body": "Start {item}. Do not drop the day, and do not carry it either."
+        },
+        {
+          "id": "em-38",
+          "title": "Give {item} the good hour",
+          "body": "Your evening usually gets the leftovers. Change that today."
+        },
+        {
+          "id": "em-39",
+          "title": "Eyes closed, day closed 🌇",
+          "body": "That is how {item} works, and it does not take long."
+        },
+        {
+          "id": "em-40",
+          "title": "Take {item} while it is quiet 🍃",
+          "body": "Start it now, before anyone needs you again."
+        }
+      ]
+    },
+    {
+      "key": "evening_soundscape",
+      "at": "19:00",
+      "hue": "#9a76c4",
+      "name": "Evening at home",
+      "about": "Cooking, commuting, kids, screens. Sound as a change of room.",
+      "items": [
+        [
+          "Escape",
+          20
+        ],
+        [
+          "Om",
+          20
+        ],
+        [
+          "Rain",
+          20
+        ],
+        [
+          "Waves",
+          20
+        ],
+        [
+          "Thunder",
+          20
+        ]
+      ],
+      "variants": [
+        {
+          "id": "es-01",
+          "title": "Turn the evening down 🌙",
+          "body": "Play {item} under the noise of the house."
+        },
+        {
+          "id": "es-03",
+          "title": "Too much noise around you? 🌊",
+          "body": "Play {item} for {min} minutes and get somewhere quieter."
+        },
+        {
+          "id": "es-04",
+          "title": "Give the evening a soundtrack 🌙",
+          "body": "Play {item} for {min} minutes. Cook, tidy, or just sit."
+        },
+        {
+          "id": "es-07",
+          "title": "Better than one more episode 🍃",
+          "body": "Play {item} for {min} minutes and see how the night goes."
+        },
+        {
+          "id": "es-08",
+          "title": "Change how tonight feels 🍃",
+          "body": "Same house, same hour, plus {min} minutes of {item}."
+        },
+        {
+          "id": "es-09",
+          "title": "Got a quiet moment? Take it 🌿",
+          "body": "Play {item} while you have the chance."
+        },
+        {
+          "id": "es-13",
+          "title": "Ease into the night 🌇",
+          "body": "Play {item} first, sleep later. There is no rush between them."
+        },
+        {
+          "id": "es-15",
+          "title": "You have been on since morning",
+          "body": "Play {item} for {min} minutes and switch off properly."
+        },
+        {
+          "id": "es-16",
+          "title": "Press play and forget it 🌊",
+          "body": "{item} keeps going on its own. Nothing for you to manage."
+        },
+        {
+          "id": "es-18",
+          "title": "Take a slow {min} minutes",
+          "body": "No plan. Put steady sound on and let the hour pass."
+        },
+        {
+          "id": "es-20",
+          "title": "Use the evening properly",
+          "body": "Play {item}. The hours before bed start feeling longer."
+        },
+        {
+          "id": "es-21",
+          "title": "Lights low, sound on 🌌",
+          "body": "Play {item} and the whole evening changes."
+        },
+        {
+          "id": "es-23",
+          "title": "Still going after all day? 🍃",
+          "body": "Let {item} carry the next {min} minutes for you."
+        },
+        {
+          "id": "es-24",
+          "title": "Make the room feel calmer",
+          "body": "That is mostly sound. Play {item} and hear the difference."
+        },
+        {
+          "id": "es-25",
+          "title": "Play {item}, not a reel ✨",
+          "body": "Not a show, not a video. One long, steady track."
+        },
+        {
+          "id": "es-26",
+          "title": "Have the evening you planned 🌙",
+          "body": "Turn one thing off, play {item}, and start the night again."
+        },
+        {
+          "id": "es-27",
+          "title": "Let the house settle 🍃",
+          "body": "Play {item} while everything slows down."
+        },
+        {
+          "id": "es-30",
+          "title": "Get somewhere quieter 🌿",
+          "body": "You do not have to move rooms. Just play {item}."
+        },
+        {
+          "id": "es-31",
+          "title": "Steady sound, steadier evening",
+          "body": "Play {item} for {min} minutes. The body reads it as safe."
+        },
+        {
+          "id": "es-32",
+          "title": "Do less for {min} minutes 🌙",
+          "body": "The evening will not fall apart. Press play on {item}."
+        },
+        {
+          "id": "es-33",
+          "title": "Ready for something slower? 🌙",
+          "body": "Play {item}. A soft landing after a long day."
+        },
+        {
+          "id": "es-34",
+          "title": "Tidy up with {item} on 🍃",
+          "body": "Play it and the last jobs of the day go calmly."
+        },
+        {
+          "id": "es-36",
+          "title": "Play one long, easy track 🌊",
+          "body": "{min} minutes of {item}, and the evening feels yours again."
+        },
+        {
+          "id": "es-39",
+          "title": "Start winding down now 🌙",
+          "body": "{min} minutes of {item} makes sleep easier later."
+        },
+        {
+          "id": "es-40",
+          "title": "Give the room a calmer shape ✨",
+          "body": "Play {item}. A few minutes is enough to feel it."
+        },
+        {
+          "id": "es-41",
+          "title": "Sit down and play {item} 🌙",
+          "body": "Give it {min} minutes off your feet, with sound instead of a screen."
+        },
+        {
+          "id": "es-42",
+          "title": "The day is done. Play {item}",
+          "body": "Nothing left to finish tonight. Just sound and a chair."
+        },
+        {
+          "id": "es-43",
+          "title": "Play {item} before bed 🌙",
+          "body": "Not sleep yet. Just the hour before it, made quieter."
+        },
+        {
+          "id": "es-44",
+          "title": "Listen to {item} tonight 🌊",
+          "body": "Give it {min} minutes and keep the rest of the evening."
+        },
+        {
+          "id": "es-45",
+          "title": "Too tired to decide? 🍃",
+          "body": "Play {item}. It asks nothing of you and it still works."
+        }
+      ]
+    },
+    {
+      "key": "night_nidra",
+      "at": "21:30",
+      "hue": "#6355b0",
+      "name": "Bedtime cue",
+      "about": "The core promise. Warm, slow, and still direct.",
+      "items": [
+        [
+          "Sleep Onset",
+          17
+        ],
+        [
+          "Deep Healing",
+          21
+        ],
+        [
+          "Stress Relief",
+          27
+        ]
+      ],
+      "variants": [
+        {
+          "id": "nn-01",
+          "title": "Let today go now 🌙",
+          "body": "Start {item}. It asks nothing from you."
+        },
+        {
+          "id": "nn-02",
+          "title": "Lights off, eyes closed 🌙",
+          "body": "Start {item} and let the voice take over from here."
+        },
+        {
+          "id": "nn-04",
+          "title": "You got through the day 🌌",
+          "body": "That is enough. Lie down and start {item}."
+        },
+        {
+          "id": "nn-05",
+          "title": "Leave the rest for tomorrow",
+          "body": "Whatever is unfinished can sleep too. Open {item}."
+        },
+        {
+          "id": "nn-06",
+          "title": "Stop trying to sleep 🌙",
+          "body": "Just start {item} and let sleep come on its own."
+        },
+        {
+          "id": "nn-07",
+          "title": "Go into the night slowly 🌌",
+          "body": "Start {item}. The voice guides and the body follows."
+        },
+        {
+          "id": "nn-08",
+          "title": "Long day, soft landing ✨",
+          "body": "Start {item}. It runs {min} minutes, so you can drift off partway."
+        },
+        {
+          "id": "nn-09",
+          "title": "Put the phone down 🌙",
+          "body": "Then lie back and start {item}. Last thing you need tonight."
+        },
+        {
+          "id": "nn-10",
+          "title": "Is your head still running? 🌌",
+          "body": "It slows later than the body. Start {item} for {min} minutes."
+        },
+        {
+          "id": "nn-11",
+          "title": "Start {item} tonight 🌙",
+          "body": "Slow and steady, and long enough to carry you all the way down."
+        },
+        {
+          "id": "nn-12",
+          "title": "Sleep cannot be forced ✨",
+          "body": "A slow voice does far more than trying harder. Start {item}."
+        },
+        {
+          "id": "nn-13",
+          "title": "The house is quiet now 🌙",
+          "body": "So is {item}. Press play and let the night close in."
+        },
+        {
+          "id": "nn-14",
+          "title": "Rest your attention somewhere",
+          "body": "That is all {item} is, for {min} slow minutes."
+        },
+        {
+          "id": "nn-15",
+          "title": "You are not doing this alone 🌌",
+          "body": "A voice, a slow count, and {min} minutes of company."
+        },
+        {
+          "id": "nn-16",
+          "title": "Start {item} and lie still 🌌",
+          "body": "Let tomorrow be tomorrow. Tonight you only have to listen."
+        },
+        {
+          "id": "nn-17",
+          "title": "Breathe out once, slowly ✨",
+          "body": "That is where {item} starts. Everything after it gets slower."
+        },
+        {
+          "id": "nn-18",
+          "title": "Back to your night practice 🌙",
+          "body": "No score, no catching up. Just start {item} tonight."
+        },
+        {
+          "id": "nn-19",
+          "title": "{item} has not changed 🌙",
+          "body": "Missed last night? Start it now, exactly as it was."
+        },
+        {
+          "id": "nn-20",
+          "title": "Sleep better tonight 🌌",
+          "body": "Start {item} for {min} minutes, lying still, following along."
+        },
+        {
+          "id": "nn-21",
+          "title": "{item} clears the way",
+          "body": "Your body knows how to sleep. This only makes room for it."
+        },
+        {
+          "id": "nn-22",
+          "title": "Stop thinking for {min} minutes 🌙",
+          "body": "Start {item}. Someone else does the talking now."
+        },
+        {
+          "id": "nn-23",
+          "title": "Slow, dark and quiet ✨",
+          "body": "Three things sleep likes. Start {item} for the third one."
+        },
+        {
+          "id": "nn-24",
+          "title": "Feeling restless tonight? 🌌",
+          "body": "Stop pushing. Start {item}, it is made for exactly this."
+        },
+        {
+          "id": "nn-25",
+          "title": "Let {item} finish the night",
+          "body": "The day is done with you. {min} minutes, eyes closed."
+        },
+        {
+          "id": "nn-26",
+          "title": "You can stop for today 🌙",
+          "body": "Start {item}. Everything else begins again tomorrow."
+        },
+        {
+          "id": "nn-28",
+          "title": "Get comfortable, press play 🌌",
+          "body": "Pillow, dark room, {item}. Nothing else to arrange."
+        },
+        {
+          "id": "nn-29",
+          "title": "Make tonight gentler 🌙",
+          "body": "Start {item} for {min} minutes before you try to sleep."
+        },
+        {
+          "id": "nn-31",
+          "title": "The last thing for today 🌙",
+          "body": "Start {item}, and then nothing at all."
+        },
+        {
+          "id": "nn-32",
+          "title": "Eyes getting heavy? Good ✨",
+          "body": "Do not fight it. Start {item} and you are done for today."
+        },
+        {
+          "id": "nn-33",
+          "title": "Quiet first, then sleep 🌌",
+          "body": "The order matters, and {item} handles the first part."
+        },
+        {
+          "id": "nn-34",
+          "title": "A soft end to a hard day 🌙",
+          "body": "Start {item}. It only asks you to lie still."
+        },
+        {
+          "id": "nn-35",
+          "title": "Comfortable? Start {item}",
+          "body": "{min} minutes, and the night takes over."
+        },
+        {
+          "id": "nn-36",
+          "title": "That is enough for today 🌙",
+          "body": "Lie back and start {item}. Let the night have the rest."
+        },
+        {
+          "id": "nn-37",
+          "title": "Slow your breathing down ✨",
+          "body": "Start {item}. A long breath out tells the body to stand down."
+        },
+        {
+          "id": "nn-38",
+          "title": "Nothing more to do tonight 🌌",
+          "body": "Not one more task. Start {item}, then sleep."
+        },
+        {
+          "id": "nn-39",
+          "title": "Finish today with {item} 🌌",
+          "body": "Lights off, nothing else running."
+        },
+        {
+          "id": "nn-40",
+          "title": "Sleep will come 🌙",
+          "body": "Give your mind somewhere quiet to go. Start {item} now."
+        }
+      ]
+    }
+  ]
+}</script>
+<script id="verdicts" type="application/json">{
+  "verdicts": {},
+  "savedAt": "2026-08-21 15:26",
+  "saves": [],
+  "note": "Rejects from the 2026-08-21 review were applied to copybank.json; see config/copybank.rejected.json"
+}</script>
+<template id="shell"><header class="page-head">
+  <p class="eyebrow">For sign-off &middot; nidra-daily-push</p>
+  <h1>168 pushes to accept or reject</h1>
+  <p class="lede">One variant per slot goes out each night, stepping forward one place, so a member
+  sees the same line again after 40 days at the earliest. Accept the ones that can ship and reject
+  the rest &mdash; every slot needs at least one line left standing. Nothing here is live yet.</p>
+  <p class="lede">Written against the 41 pushes sent by hand before this: verb first, the session
+  named in the title as often as they named it, <i>Start</i> for guided sessions and <i>play</i> or
+  <i>listen</i> for soundscapes, and the duration mentioned only where it earns its place. The
+  numbers behind that are at the foot of the page.</p>
+</header>
+
+<nav class="bar" aria-label="Filter and progress">
+  <button class="chip is-on" data-filter="all">All 168</button>
+  <button class="chip" data-filter="undecided">Undecided</button>
+  <button class="chip" data-filter="accepted">Accepted</button>
+  <button class="chip" data-filter="rejected">Rejected</button>
+  <span class="tally"><b class="n-acc">0</b> accepted &middot; <b class="n-rej">0</b> rejected &middot; <b class="n-und">168</b> to go</span>
+  <button class="btn save" type="button" disabled>Copy my decisions</button>
+  <button class="chip discard" type="button" hidden>Clear my picks</button>
+</nav>
+<p class="save-line"><span class="save-status"></span> <span class="saved-at"></span></p>
+
+<div id="slots"></div>
+
+<section class="export">
+  <h2>Your decisions</h2>
+  <p>Your picks stay in this browser. <b>Copy my decisions</b> puts the whole list on your
+  clipboard as plain text &mdash; paste it into Slack, a message, or straight back to whoever asked
+  for the review. The lists below are the same ids, if you would rather copy one side only.</p>
+  <div class="lists">
+    <div><h3>Accepted <span class="n-acc">0</span></h3><pre class="out-acc">none yet</pre></div>
+    <div><h3>Rejected <span class="n-rej">0</span></h3><pre class="out-rej">none yet</pre></div>
+  </div>
+  <pre class="out-report" hidden></pre>
+</section>
+
+<section class="history">
+  <h2>What the last 41 pushes did</h2>
+  <p>This is the record the copy above was written from: every broadcast sent by hand from the
+  admin dashboard between 21 June and 10 August 2026 &mdash; 41 pushes, 151,456 phones targeted,
+  147,233 delivered. Voice, emoji share, verb choice and how often the session is named all come
+  from here. Two things in it changed the pipeline, and three are still yours to decide.</p>
+  <dl class="stats">
+    <div><dt>Pushes</dt><dd>41</dd></div>
+    <div><dt>Over</dt><dd>51 days</dd></div>
+    <div><dt>Delivered</dt><dd>147,233</dd></div>
+    <div><dt>Missed</dt><dd>2.79%</dd></div>
+    <div><dt>Base grew</dt><dd>3.0&times;</dd></div>
+    <div><dt>Reached <code>completed</code></dt><dd>0</dd></div>
+  </dl>
+
+  <h3>When those pushes went out</h3>
+  <ul class="clock">
+      <li><span class="hr">09:00</span><span class="bar" style="--w:40%"></span><b>2</b><span></span></li>
+      <li class="is-ours"><span class="hr">10:00</span><span class="bar" style="--w:20%"></span><b>1</b><span class="ours">10:00 slot</span></li>
+      <li><span class="hr">11:00</span><span class="bar" style="--w:80%"></span><b>4</b><span></span></li>
+      <li><span class="hr">12:00</span><span class="bar" style="--w:60%"></span><b>3</b><span></span></li>
+      <li><span class="hr">13:00</span><span class="bar" style="--w:40%"></span><b>2</b><span></span></li>
+      <li class="is-ours"><span class="hr">14:00</span><span class="bar" style="--w:20%"></span><b>1</b><span class="ours">14:00 slot</span></li>
+      <li><span class="hr">15:00</span><span class="bar" style="--w:40%"></span><b>2</b><span></span></li>
+      <li><span class="hr">16:00</span><span class="bar" style="--w:60%"></span><b>3</b><span></span></li>
+      <li class="is-ours"><span class="hr">17:00</span><span class="bar" style="--w:100%"></span><b>5</b><span class="ours">17:00 slot</span></li>
+      <li><span class="hr">18:00</span><span class="bar" style="--w:60%"></span><b>3</b><span></span></li>
+      <li class="is-ours"><span class="hr">19:00</span><span class="bar" style="--w:80%"></span><b>4</b><span class="ours">19:00 slot</span></li>
+      <li><span class="hr">20:00</span><span class="bar" style="--w:40%"></span><b>2</b><span></span></li>
+      <li class="is-ours"><span class="hr">21:00</span><span class="bar" style="--w:80%"></span><b>4</b><span class="ours">21:30 slot</span></li>
+      <li><span class="hr">22:00</span><span class="bar" style="--w:100%"></span><b>5</b><span></span></li>
+  </ul>
+  <p class="note">Bars count the 41 historical sends by the hour they left; gold marks an hour
+  one of our five slots fires in. The evening is proven ground &mdash; 17:00 and 22:00 are the
+  two busiest hours in the record. The two daytime slots are not: 10:00 and 14:00 have carried
+  one push each in seven weeks, so 40% of the new schedule sends into hours nobody has tested.
+  Nothing has ever gone out before 09:32 or after 22:43, and the 21:30 slot plus its 5&ndash;30
+  minute jitter stops at 22:00, inside that window.</p>
+
+  <h3>The record against the new bank</h3>
+  <div class="tablewrap">
+    <table class="diverge">
+      <thead>
+        <tr><th scope="col"></th><th scope="col">Last 41 pushes</th><th scope="col">New bank</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Pushes per day</th><td>0.80 &mdash; 41 across 51 days</td><td class="now">5.00, every day</td></tr>
+        <tr><th scope="row">Days with a push</th><td>25 of 51 (49%)</td><td class="now">every day</td></tr>
+        <tr><th scope="row">Most in one day</th><td>4 &mdash; 22 June</td><td class="now">5</td></tr>
+        <tr><th scope="row">Send window</th><td>09:32 &ndash; 22:43</td><td class="now">10:05 &ndash; 22:00</td></tr>
+        <tr><th scope="row">Sends after 17:00</th><td>23 of 41 (56%)</td><td class="now">3 of 5 (60%)</td></tr>
+        <tr><th scope="row">Carried an image</th><td>28 of 41 (68%)</td><td class="now">none</td></tr>
+        <tr><th scope="row">Had an emoji</th><td>24 of 41 (59%)</td><td class="now">137 of 200 (68%)</td></tr>
+        <tr><th scope="row">Named a duration</th><td>5 of 41 (12%)</td><td class="now">60 of 200 (30%)</td></tr>
+        <tr><th scope="row">Named the session</th><td>38 of 41 (93%)</td><td class="now">186 of 200 (93%)</td></tr>
+        <tr><th scope="row">Named it in the title</th><td>9 of 41 (22%)</td><td class="now">45 of 200 (22%)</td></tr>
+        <tr><th scope="row">Lead verb</th><td>Start 23, Play 9</td><td class="now">Start 86, play 59</td></tr>
+        <tr><th scope="row">Repeated a line</th><td>identical push on 26 and 27 June</td><td class="now">no repeat inside 40 days</td></tr>
+        <tr><th scope="row">Terminal status</th><td>partial, 41 of 41</td><td class="now">partial counts as delivered</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Three historical lines would not clear the validator the new bank is written
+  against: <i>Start FOCUS BREATHING</i> and <i>LIVE: 30min Breathing session</i> trip the
+  no-acronym rule, and <i>Ready For a Deep Sleep!</i> carries an exclamation mark into the
+  night slot. A fourth &mdash; <i>Let soothing sounds follow you through the day.</i> &mdash; is
+  49 characters against our 45-character title ceiling. Three more pointed at a live group
+  session or the sleep log rather than a player screen, which this pipeline cannot deep-link
+  to at all.</p>
+
+  <h3>What it changed, and what is yours to call</h3>
+  <ul class="calls">
+    <li>
+      <span class="flag-tag fixed">Fixed</span>
+      <h4>Every campaign in the record ends at <code>partial</code>, not <code>completed</code></h4>
+      <p>Not one of the 41 reached a clean sweep &mdash; a broadcast to the whole base always
+      hits some dead token. The executor treated anything short of <code>completed</code> as a
+      failure, so every push would have paged the failure topic, failed its run, and left the
+      slot marked <code>failed</code> &mdash; where a rerun of the same cron would have sent it
+      a second time. Delivery is now judged on the failure rate instead.</p>
+    </li>
+    <li>
+      <span class="flag-tag fixed">Fixed</span>
+      <h4>A 48.5% failure is a token purge, not an outage</h4>
+      <p>Normal misses run 0.27&ndash;4.79% of the audience. The one exception, 19:22 on
+      21 June, lost 1,887 of 3,891 &mdash; and the next send three hours later targeted 2,025,
+      because those dead tokens were gone. Above 10% now raises an alert without failing the
+      run, so a purge is visible but never re-sends the push.</p>
+    </li>
+    <li>
+      <span class="flag-tag">Your call</span>
+      <h4>Five a day is roughly six times the volume the base has ever seen</h4>
+      <p>The record averages 0.8 pushes a day and went silent for half of those 51 days. The
+      new schedule sends five, every day, to a base that has tripled to 6,031 in seven weeks.
+      The copy is ready for it; the audience has never been asked to take it.</p>
+    </li>
+    <li>
+      <span class="flag-tag">Your call</span>
+      <h4>Two in three historical pushes carried an image. Ours carry none.</h4>
+      <p>28 of 41 shipped with artwork. The send payload supports an image and the planner
+      never sets one, so every push in the new schedule is text-only &mdash; a visibly plainer
+      notification than the house style, five times a day.</p>
+    </li>
+    <li>
+      <span class="flag-tag">Your call</span>
+      <h4>The new copy still names the clock more often than the record did</h4>
+      <p>Only 5 of 41 pushes named a duration. The bank is down from 113 variants to 60, so
+      roughly one send in three still states the cost up front against one in eight before.
+      That gap is deliberate &mdash; a named length is the cheapest reason to tap &mdash; but it is
+      the last real divergence left in the copy.
+    </li>
+    <li>
+      <span class="flag-tag fixed">Matched</span>
+      <h4>Emoji, verbs and the session name now sit where the record put them</h4>
+      <p>Emoji: 59% of the record, 68% of the bank. The session named in the title: 22% in both.
+      <i>Start</i> leads 86 of 200 variants against <i>play</i>'s 59, the same order as the
+      record's Start&nbsp;23 to Play&nbsp;9 &mdash; and <i>Start</i> is used for guided sessions
+      while soundscapes keep <i>play</i> and <i>listen</i>, exactly as the record did.</p>
+    </li>
+  </ul>
+</section>
+
+<section class="kinds">
+  <h2>What actually goes out today</h2>
+  <p>The same 41 sends, read for content rather than counts &mdash; every one of them, rendered the
+  way it landed. Seven kinds of push, and five of them map cleanly onto a slot in the new schedule.
+  Two do not.</p>
+
+<div class="kind" style="--hue:#7b95d6">
+  <div class="kind-head">
+    <h3>Breathing</h3>
+    <span class="kind-n">6 of 41</span>
+    <span class="kind-slot">morning_focus &middot; 10:00</span>
+  </div>
+  <p>Named the practice and the payoff, always before 13:00 &mdash; earliest 09:32, latest 12:59. The only kind that ever mentioned a length in the title (<i>Focus Breathing | 4 Mins</i>).</p>
+  <div class="cards">
+<article class="card real">
+  <header class="card-head">
+    <span class="when">29/07 &middot; 12:31</span>
+    <span class="deliv"><b>5,332</b> of 5,353</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Start FOCUS BREATHING</span>
+      <span class="notif-body">Recharge with the power of your breath. 🌬️</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">28/07 &middot; 11:06</span>
+    <span class="deliv"><b>5,296</b> of 5,335</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Start Focus Breathing | 4 Mins</span>
+      <span class="notif-body">Breathe in calm. Breathe out stress.</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">03/07 &middot; 11:34</span>
+    <span class="deliv"><b>2,511</b> of 2,572</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Start your day with mindful breathing. 🌿</span>
+      <span class="notif-body">Start a Focus Breathing Session</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">26/06 &middot; 09:32</span>
+    <span class="deliv"><b>2,172</b> of 2,196</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Begin your morning with Focus Breathing 🌬️</span>
+      <span class="notif-body">Clear your mind. Sharpen your focus.</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">23/06 &middot; 11:26</span>
+    <span class="deliv"><b>2,066</b> of 2,097</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Less stress. More focus.</span>
+      <span class="notif-body">Take a pause with Focus Breathing</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">22/06 &middot; 12:59</span>
+    <span class="deliv"><b>2,036</b> of 2,057</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Quick Reset</span>
+      <span class="notif-body">Start a Breathing Session Now</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+  </div>
+</div>
+<div class="kind" style="--hue:#5fb0c9">
+  <div class="kind-head">
+    <h3>Sound &mdash; Om and Escape</h3>
+    <span class="kind-n">9 of 41</span>
+    <span class="kind-slot">afternoon_soundscape &middot; 14:00 &nbsp;/&nbsp; evening_soundscape &middot; 19:00</span>
+  </div>
+  <p>Two soundtracks carried all nine: Om (5) and Escape (4). Spread across the whole day, 10:05 to 21:24. The verb is always listen or play, never follow &mdash; there is no voice in these.</p>
+  <div class="cards">
+<article class="card real">
+  <header class="card-head">
+    <span class="when">10/08 &middot; 14:38</span>
+    <span class="deliv"><b>5,776</b> of 6,031</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Reset your mind with Om. 🕉️</span>
+      <span class="notif-body">Tap to start.</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">02/08 &middot; 21:24</span>
+    <span class="deliv"><b>5,522</b> of 5,646</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Find calm before you sleep. 🌙</span>
+      <span class="notif-body">Chant Om now.</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">29/07 &middot; 10:05</span>
+    <span class="deliv"><b>5,332</b> of 5,384</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Let soothing sounds follow you through the day. 🎶</span>
+      <span class="notif-body">Press play.</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">26/07 &middot; 15:36</span>
+    <span class="deliv"><b>5,215</b> of 5,349</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Pause the noise. Embrace the melody. 🌙</span>
+      <span class="notif-body">Listen to Escape.</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">22/07 &middot; 11:08</span>
+    <span class="deliv"><b>5,030</b> of 5,063</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Let the sound of Om quiet your mind.</span>
+      <span class="notif-body">Listen now.</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">11/07 &middot; 20:13</span>
+    <span class="deliv"><b>4,306</b> of 4,332</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Quick Relax &amp; Restoration</span>
+      <span class="notif-body">Play Escape Sound Healing 🎶</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">11/07 &middot; 16:05</span>
+    <span class="deliv"><b>4,299</b> of 4,396</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Let the sound of Om help you unwind. 🌙</span>
+      <span class="notif-body">Start the healing | Play</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">09/07 &middot; 17:00</span>
+    <span class="deliv"><b>3,991</b> of 4,055</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Take a break from the noise. 🌙</span>
+      <span class="notif-body">Press play on Escape.</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">08/07 &middot; 17:25</span>
+    <span class="deliv"><b>3,682</b> of 3,694</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Need a moment of peace? 🌿</span>
+      <span class="notif-body">Listen to Escape | Play Now</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+  </div>
+</div>
+<div class="kind" style="--hue:#8a6fd6">
+  <div class="kind-head">
+    <h3>Yog Nidra</h3>
+    <span class="kind-n">11 of 41</span>
+    <span class="kind-slot">morning_focus &middot; 10:00 &nbsp;/&nbsp; evening_meditation &middot; 17:00</span>
+  </div>
+  <p>The most-pushed thing in the app: 11 of 41, from 12:25 to 21:47. Body copy is nearly always the same sentence &mdash; <i>Start Yog Nidra Session</i> &mdash; with the whole variation carried by the title.</p>
+  <div class="cards">
+<article class="card real">
+  <header class="card-head">
+    <span class="when">27/07 &middot; 17:31</span>
+    <span class="deliv"><b>5,253</b> of 5,326</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Relax. Breathe. Unwind. 🤍</span>
+      <span class="notif-body">Begin your Yog Nidra session.</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">21/07 &middot; 13:57</span>
+    <span class="deliv"><b>4,988</b> of 5,099</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Relax your body. Quiet your mind. 💙</span>
+      <span class="notif-body">Start your Yog Nidra.</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">17/07 &middot; 19:25</span>
+    <span class="deliv"><b>4,819</b> of 5,002</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Let go of stress.</span>
+      <span class="notif-body">Tap To Begin - Yog Nidra Session</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">09/07 &middot; 19:02</span>
+    <span class="deliv"><b>3,999</b> of 4,010</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Relax your body. Calm your mind. 🤍</span>
+      <span class="notif-body">Start Yog Nidra Session | Play</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">08/07 &middot; 15:40</span>
+    <span class="deliv"><b>3,681</b> of 3,746</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Calm Your Mind 🌙</span>
+      <span class="notif-body">Start Yog Nidra Session</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">06/07 &middot; 21:12</span>
+    <span class="deliv"><b>3,069</b> of 3,179</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Deeply relax 🌙</span>
+      <span class="notif-body">Start Yog Nidra Session | Play</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">01/07 &middot; 16:19</span>
+    <span class="deliv"><b>2,404</b> of 2,525</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Pause. Breathe. Restore. 🌿</span>
+      <span class="notif-body">Start Yog Nidra Session | Click Here</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">25/06 &middot; 18:42</span>
+    <span class="deliv"><b>2,152</b> of 2,227</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Start Yog Nidra Session 🌘</span>
+      <span class="notif-body">Take 10 minutes for yourself</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">24/06 &middot; 12:25</span>
+    <span class="deliv"><b>2,106</b> of 2,145</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Say Yes to 10 mins of Peace</span>
+      <span class="notif-body">Start Yog Nidra Session</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">23/06 &middot; 21:06</span>
+    <span class="deliv"><b>2,079</b> of 2,116</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Racing Thought ?</span>
+      <span class="notif-body">Start Yog Nidra Session</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">21/06 &middot; 19:22</span>
+    <span class="deliv"><b>2,004</b> of 3,891</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Calm Your Mind</span>
+      <span class="notif-body">Start Yog Nidra Session</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span><span class="mark warn">token purge</span></div>
+</article>
+  </div>
+</div>
+<div class="kind" style="--hue:#c98f6a">
+  <div class="kind-head">
+    <h3>Evening wind-down</h3>
+    <span class="kind-n">6 of 41</span>
+    <span class="kind-slot">evening_meditation &middot; 17:00</span>
+  </div>
+  <p>A tight 16:00&ndash;20:30 band. Slower verbs than the rest &mdash; slow down, unwind, restore &mdash; and the one kind that names the time of day in the copy itself.</p>
+  <div class="cards">
+<article class="card real">
+  <header class="card-head">
+    <span class="when">21/07 &middot; 17:09</span>
+    <span class="deliv"><b>4,988</b> of 5,010</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Slow Down A Little</span>
+      <span class="notif-body">Start a short Evening Wind Down Session</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">07/07 &middot; 16:25</span>
+    <span class="deliv"><b>3,419</b> of 3,471</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Start A Wind Down Session</span>
+      <span class="notif-body">Pause. Breathe. Relax. ✨</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">01/07 &middot; 19:47</span>
+    <span class="deliv"><b>2,418</b> of 2,432</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Time to unwind. 🌙</span>
+      <span class="notif-body">Evening Wind Down | Click Here</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">26/06 &middot; 18:42</span>
+    <span class="deliv"><b>2,190</b> of 2,245</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Time to Wind Down</span>
+      <span class="notif-body">Start Wind Down Session | Tap Here</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">24/06 &middot; 20:30</span>
+    <span class="deliv"><b>2,118</b> of 2,144</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">🌙 Time to slow down.</span>
+      <span class="notif-body">Calm night begins with a gentle wind-down routine.</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">22/06 &middot; 17:54</span>
+    <span class="deliv"><b>2,048</b> of 2,079</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Evening Wind Down</span>
+      <span class="notif-body">Relax | Guided Session | Start Now</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+  </div>
+</div>
+<div class="kind" style="--hue:#6f79d6">
+  <div class="kind-head">
+    <h3>Night nidra and sleep</h3>
+    <span class="kind-n">6 of 41</span>
+    <span class="kind-slot">night_nidra &middot; 21:30</span>
+  </div>
+  <p>Never before 21:47, five of six after 22:00. Names the sleep session outright &mdash; Sleep Onset, Stress Relief, Deep Healing &mdash; or drops the name entirely for <i>It&rsquo;s time to rest.</i></p>
+  <div class="cards">
+<article class="card real">
+  <header class="card-head">
+    <span class="when">29/07 &middot; 22:11</span>
+    <span class="deliv"><b>5,342</b> of 5,375</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Tap To Sleep Now</span>
+      <span class="notif-body">Start Sleep Onset Nidra Session</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">18/07 &middot; 22:22</span>
+    <span class="deliv"><b>4,893</b> of 4,949</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Start Stress Relief Nidra</span>
+      <span class="notif-body">Sleep Better Tonight</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">27/06 &middot; 22:40</span>
+    <span class="deliv"><b>2,245</b> of 2,282</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">It&#x27;s time to rest. 🤍</span>
+      <span class="notif-body">Play and let Nidra do the rest.</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">26/06 &middot; 22:21</span>
+    <span class="deliv"><b>2,192</b> of 2,215</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">It&#x27;s time to rest. 🤍</span>
+      <span class="notif-body">Play and let Nidra do the rest.</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">22/06 &middot; 21:47</span>
+    <span class="deliv"><b>2,049</b> of 2,070</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Deep Healing Nidra</span>
+      <span class="notif-body">Start Now for a Deep Sleep</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">21/06 &middot; 22:43</span>
+    <span class="deliv"><b>1,995</b> of 2,025</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">🌙 Ready For a Deep Sleep!</span>
+      <span class="notif-body">Start | Sleep Onset Nidra</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+  </div>
+</div>
+<div class="kind" style="--hue:#e0b64c">
+  <div class="kind-head">
+    <h3>Live group session</h3>
+    <span class="kind-n">2 of 41</span>
+    <span class="kind-slot none">no slot in this pipeline</span>
+  </div>
+  <p>Both pointed at a live 30-minute breathing session &mdash; one a same-day heads-up at 13:16, one the <i>join now</i> at 18:58. Event copy, sent in a pair, and the deep link is a group, not a player.</p>
+  <div class="cards">
+<article class="card real">
+  <header class="card-head">
+    <span class="when">23/07 &middot; 18:58</span>
+    <span class="deliv"><b>5,108</b> of 5,138</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">LIVE: 30min Breathing session</span>
+      <span class="notif-body">Join Now 30min breathing session live</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">23/07 &middot; 13:16</span>
+    <span class="deliv"><b>5,098</b> of 5,155</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Upcoming 30min Breathing Session Today</span>
+      <span class="notif-body">Join Group for live breathing session today evening</span>
+    </div>
+  </div>
+  
+</article>
+  </div>
+</div>
+<div class="kind" style="--hue:#e0b64c">
+  <div class="kind-head">
+    <h3>Sleep log</h3>
+    <span class="kind-n">1 of 41</span>
+    <span class="kind-slot none">no slot in this pipeline</span>
+  </div>
+  <p>One push, 09:38, asking a question the app can answer for itself. The only send that asked for input rather than offering a session.</p>
+  <div class="cards">
+<article class="card real">
+  <header class="card-head">
+    <span class="when">22/06 &middot; 09:38</span>
+    <span class="deliv"><b>2,010</b> of 2,040</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">How did you sleep last night ?</span>
+      <span class="notif-body">Record your sleep | Click Here</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+  </div>
+</div>
+
+  <div class="kind">
+    <div class="kind-head"><h3>Two sentence shapes, three flavours</h3><span class="kind-n">shipped copy</span></div>
+    <p>Strip the session names out and every one of the 41 pushes is one of two shapes. The
+    flavours below sit inside the first one and recur often enough to be house style &mdash; the
+    rewrite keeps one, drops another, and cannot reproduce the second shape at all.</p>
+    <ul class="shapes">
+    <li><span class="shape-name">Shape 1 &mdash; benefit, then the tap <span>&middot; 30 of 41</span></span><q>Let go of stress. — Tap To Begin - Yog Nidra Session</q><p>The house default, and the shape the new bank inherits: title earns the read, body spends it on one instruction. Only two sends fit neither shape, both of them evening wind-down copy with no instruction at all.</p></li>
+    <li><span class="shape-name">Shape 2 &mdash; the session name is the whole title <span>&middot; 9 of 41</span></span><q>Deep Healing Nidra — Start Now for a Deep Sleep</q><p>Works because members already know these names. The bank now opens 45 of its 200 titles with the session — the same 22% share — but never bare: {item} has to read for every item the slot can serve, so it always sits in a phrase.</p></li>
+    <li><span class="shape-name">Flavour &mdash; staccato commands <span>&middot; 6 of 41</span></span><q>Relax. Breathe. Unwind. 🤍 — Begin your Yog Nidra session.</q><p>Three one-word orders, then the session. The closest the old copy came to the new voice.</p></li>
+    <li><span class="shape-name">Flavour &mdash; stacked pipe CTA <span>&middot; 10 of 41</span></span><q>Time to unwind. 🌙 — Evening Wind Down | Click Here</q><p>A pipe standing in for a button. Reads as UI, not speech — the rewrite drops it.</p></li>
+    <li><span class="shape-name">Flavour &mdash; straight question <span>&middot; 3 of 41</span></span><q>Racing Thought ? — Start Yog Nidra Session</q><p>Rare, and each one is a symptom the session answers. Two carry a stray space before the question mark.</p></li>
+    </ul>
+  </div>
+
+  <div class="kind">
+    <div class="kind-head"><h3>The verbs they actually used</h3><span class="kind-n">across 41 sends</span></div>
+    <p>Every push ended in an instruction, and the vocabulary is narrow. <i>Start</i> alone carries
+    more than half of them. The new bank leans on play, take and stop instead &mdash; the same register,
+    a wider set of words, and no <i>Click Here</i>.</p>
+    <ul class="verbs"><li>Start <b>23</b></li><li>Play <b>9</b></li><li>Tap <b>4</b></li><li>Begin <b>4</b></li><li>Take <b>3</b></li><li>Listen <b>3</b></li><li>Click Here <b>3</b></li><li>Press play <b>2</b></li><li>Join <b>2</b></li><li>Record <b>1</b></li></ul>
+  </div>
+
+  <p class="note">Five of the seven kinds already have a slot, and between them they cover 38 of the
+  41 sends. The two that do not &mdash; the live-session pair and the sleep-log ask &mdash; are the
+  only things in seven weeks of pushing that this pipeline cannot send at all, because both deep-link
+  somewhere other than a player screen. They stay a manual job.</p>
+</section>
+
+<footer class="page-foot">
+  <p>Generated from <code>config/copybank.json</code> by <code>scripts/build-review-page.ts</code>.
+  Decisions are per-reviewer and never published back into this page &mdash; they travel by copy and
+  paste, so two people reviewing at once cannot overwrite each other.</p>
+</footer></template>
+<header class="page-head">
+  <p class="eyebrow">For sign-off &middot; nidra-daily-push</p>
+  <h1>168 pushes to accept or reject</h1>
+  <p class="lede">One variant per slot goes out each night, stepping forward one place, so a member
+  sees the same line again after 40 days at the earliest. Accept the ones that can ship and reject
+  the rest &mdash; every slot needs at least one line left standing. Nothing here is live yet.</p>
+  <p class="lede">Written against the 41 pushes sent by hand before this: verb first, the session
+  named in the title as often as they named it, <i>Start</i> for guided sessions and <i>play</i> or
+  <i>listen</i> for soundscapes, and the duration mentioned only where it earns its place. The
+  numbers behind that are at the foot of the page.</p>
+</header>
+
+<nav class="bar" aria-label="Filter and progress">
+  <button class="chip is-on" data-filter="all">All 168</button>
+  <button class="chip" data-filter="undecided">Undecided</button>
+  <button class="chip" data-filter="accepted">Accepted</button>
+  <button class="chip" data-filter="rejected">Rejected</button>
+  <span class="tally"><b class="n-acc">0</b> accepted &middot; <b class="n-rej">0</b> rejected &middot; <b class="n-und">168</b> to go</span>
+  <button class="btn save" type="button" disabled>Copy my decisions</button>
+  <button class="chip discard" type="button" hidden>Clear my picks</button>
+</nav>
+<p class="save-line"><span class="save-status"></span> <span class="saved-at"></span></p>
+
+<div id="slots"></div>
+
+<section class="export">
+  <h2>Your decisions</h2>
+  <p>Your picks stay in this browser. <b>Copy my decisions</b> puts the whole list on your
+  clipboard as plain text &mdash; paste it into Slack, a message, or straight back to whoever asked
+  for the review. The lists below are the same ids, if you would rather copy one side only.</p>
+  <div class="lists">
+    <div><h3>Accepted <span class="n-acc">0</span></h3><pre class="out-acc">none yet</pre></div>
+    <div><h3>Rejected <span class="n-rej">0</span></h3><pre class="out-rej">none yet</pre></div>
+  </div>
+  <pre class="out-report" hidden></pre>
+</section>
+
+<section class="history">
+  <h2>What the last 41 pushes did</h2>
+  <p>This is the record the copy above was written from: every broadcast sent by hand from the
+  admin dashboard between 21 June and 10 August 2026 &mdash; 41 pushes, 151,456 phones targeted,
+  147,233 delivered. Voice, emoji share, verb choice and how often the session is named all come
+  from here. Two things in it changed the pipeline, and three are still yours to decide.</p>
+  <dl class="stats">
+    <div><dt>Pushes</dt><dd>41</dd></div>
+    <div><dt>Over</dt><dd>51 days</dd></div>
+    <div><dt>Delivered</dt><dd>147,233</dd></div>
+    <div><dt>Missed</dt><dd>2.79%</dd></div>
+    <div><dt>Base grew</dt><dd>3.0&times;</dd></div>
+    <div><dt>Reached <code>completed</code></dt><dd>0</dd></div>
+  </dl>
+
+  <h3>When those pushes went out</h3>
+  <ul class="clock">
+      <li><span class="hr">09:00</span><span class="bar" style="--w:40%"></span><b>2</b><span></span></li>
+      <li class="is-ours"><span class="hr">10:00</span><span class="bar" style="--w:20%"></span><b>1</b><span class="ours">10:00 slot</span></li>
+      <li><span class="hr">11:00</span><span class="bar" style="--w:80%"></span><b>4</b><span></span></li>
+      <li><span class="hr">12:00</span><span class="bar" style="--w:60%"></span><b>3</b><span></span></li>
+      <li><span class="hr">13:00</span><span class="bar" style="--w:40%"></span><b>2</b><span></span></li>
+      <li class="is-ours"><span class="hr">14:00</span><span class="bar" style="--w:20%"></span><b>1</b><span class="ours">14:00 slot</span></li>
+      <li><span class="hr">15:00</span><span class="bar" style="--w:40%"></span><b>2</b><span></span></li>
+      <li><span class="hr">16:00</span><span class="bar" style="--w:60%"></span><b>3</b><span></span></li>
+      <li class="is-ours"><span class="hr">17:00</span><span class="bar" style="--w:100%"></span><b>5</b><span class="ours">17:00 slot</span></li>
+      <li><span class="hr">18:00</span><span class="bar" style="--w:60%"></span><b>3</b><span></span></li>
+      <li class="is-ours"><span class="hr">19:00</span><span class="bar" style="--w:80%"></span><b>4</b><span class="ours">19:00 slot</span></li>
+      <li><span class="hr">20:00</span><span class="bar" style="--w:40%"></span><b>2</b><span></span></li>
+      <li class="is-ours"><span class="hr">21:00</span><span class="bar" style="--w:80%"></span><b>4</b><span class="ours">21:30 slot</span></li>
+      <li><span class="hr">22:00</span><span class="bar" style="--w:100%"></span><b>5</b><span></span></li>
+  </ul>
+  <p class="note">Bars count the 41 historical sends by the hour they left; gold marks an hour
+  one of our five slots fires in. The evening is proven ground &mdash; 17:00 and 22:00 are the
+  two busiest hours in the record. The two daytime slots are not: 10:00 and 14:00 have carried
+  one push each in seven weeks, so 40% of the new schedule sends into hours nobody has tested.
+  Nothing has ever gone out before 09:32 or after 22:43, and the 21:30 slot plus its 5&ndash;30
+  minute jitter stops at 22:00, inside that window.</p>
+
+  <h3>The record against the new bank</h3>
+  <div class="tablewrap">
+    <table class="diverge">
+      <thead>
+        <tr><th scope="col"></th><th scope="col">Last 41 pushes</th><th scope="col">New bank</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Pushes per day</th><td>0.80 &mdash; 41 across 51 days</td><td class="now">5.00, every day</td></tr>
+        <tr><th scope="row">Days with a push</th><td>25 of 51 (49%)</td><td class="now">every day</td></tr>
+        <tr><th scope="row">Most in one day</th><td>4 &mdash; 22 June</td><td class="now">5</td></tr>
+        <tr><th scope="row">Send window</th><td>09:32 &ndash; 22:43</td><td class="now">10:05 &ndash; 22:00</td></tr>
+        <tr><th scope="row">Sends after 17:00</th><td>23 of 41 (56%)</td><td class="now">3 of 5 (60%)</td></tr>
+        <tr><th scope="row">Carried an image</th><td>28 of 41 (68%)</td><td class="now">none</td></tr>
+        <tr><th scope="row">Had an emoji</th><td>24 of 41 (59%)</td><td class="now">137 of 200 (68%)</td></tr>
+        <tr><th scope="row">Named a duration</th><td>5 of 41 (12%)</td><td class="now">60 of 200 (30%)</td></tr>
+        <tr><th scope="row">Named the session</th><td>38 of 41 (93%)</td><td class="now">186 of 200 (93%)</td></tr>
+        <tr><th scope="row">Named it in the title</th><td>9 of 41 (22%)</td><td class="now">45 of 200 (22%)</td></tr>
+        <tr><th scope="row">Lead verb</th><td>Start 23, Play 9</td><td class="now">Start 86, play 59</td></tr>
+        <tr><th scope="row">Repeated a line</th><td>identical push on 26 and 27 June</td><td class="now">no repeat inside 40 days</td></tr>
+        <tr><th scope="row">Terminal status</th><td>partial, 41 of 41</td><td class="now">partial counts as delivered</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Three historical lines would not clear the validator the new bank is written
+  against: <i>Start FOCUS BREATHING</i> and <i>LIVE: 30min Breathing session</i> trip the
+  no-acronym rule, and <i>Ready For a Deep Sleep!</i> carries an exclamation mark into the
+  night slot. A fourth &mdash; <i>Let soothing sounds follow you through the day.</i> &mdash; is
+  49 characters against our 45-character title ceiling. Three more pointed at a live group
+  session or the sleep log rather than a player screen, which this pipeline cannot deep-link
+  to at all.</p>
+
+  <h3>What it changed, and what is yours to call</h3>
+  <ul class="calls">
+    <li>
+      <span class="flag-tag fixed">Fixed</span>
+      <h4>Every campaign in the record ends at <code>partial</code>, not <code>completed</code></h4>
+      <p>Not one of the 41 reached a clean sweep &mdash; a broadcast to the whole base always
+      hits some dead token. The executor treated anything short of <code>completed</code> as a
+      failure, so every push would have paged the failure topic, failed its run, and left the
+      slot marked <code>failed</code> &mdash; where a rerun of the same cron would have sent it
+      a second time. Delivery is now judged on the failure rate instead.</p>
+    </li>
+    <li>
+      <span class="flag-tag fixed">Fixed</span>
+      <h4>A 48.5% failure is a token purge, not an outage</h4>
+      <p>Normal misses run 0.27&ndash;4.79% of the audience. The one exception, 19:22 on
+      21 June, lost 1,887 of 3,891 &mdash; and the next send three hours later targeted 2,025,
+      because those dead tokens were gone. Above 10% now raises an alert without failing the
+      run, so a purge is visible but never re-sends the push.</p>
+    </li>
+    <li>
+      <span class="flag-tag">Your call</span>
+      <h4>Five a day is roughly six times the volume the base has ever seen</h4>
+      <p>The record averages 0.8 pushes a day and went silent for half of those 51 days. The
+      new schedule sends five, every day, to a base that has tripled to 6,031 in seven weeks.
+      The copy is ready for it; the audience has never been asked to take it.</p>
+    </li>
+    <li>
+      <span class="flag-tag">Your call</span>
+      <h4>Two in three historical pushes carried an image. Ours carry none.</h4>
+      <p>28 of 41 shipped with artwork. The send payload supports an image and the planner
+      never sets one, so every push in the new schedule is text-only &mdash; a visibly plainer
+      notification than the house style, five times a day.</p>
+    </li>
+    <li>
+      <span class="flag-tag">Your call</span>
+      <h4>The new copy still names the clock more often than the record did</h4>
+      <p>Only 5 of 41 pushes named a duration. The bank is down from 113 variants to 60, so
+      roughly one send in three still states the cost up front against one in eight before.
+      That gap is deliberate &mdash; a named length is the cheapest reason to tap &mdash; but it is
+      the last real divergence left in the copy.
+    </li>
+    <li>
+      <span class="flag-tag fixed">Matched</span>
+      <h4>Emoji, verbs and the session name now sit where the record put them</h4>
+      <p>Emoji: 59% of the record, 68% of the bank. The session named in the title: 22% in both.
+      <i>Start</i> leads 86 of 200 variants against <i>play</i>'s 59, the same order as the
+      record's Start&nbsp;23 to Play&nbsp;9 &mdash; and <i>Start</i> is used for guided sessions
+      while soundscapes keep <i>play</i> and <i>listen</i>, exactly as the record did.</p>
+    </li>
+  </ul>
+</section>
+
+<section class="kinds">
+  <h2>What actually goes out today</h2>
+  <p>The same 41 sends, read for content rather than counts &mdash; every one of them, rendered the
+  way it landed. Seven kinds of push, and five of them map cleanly onto a slot in the new schedule.
+  Two do not.</p>
+
+<div class="kind" style="--hue:#7b95d6">
+  <div class="kind-head">
+    <h3>Breathing</h3>
+    <span class="kind-n">6 of 41</span>
+    <span class="kind-slot">morning_focus &middot; 10:00</span>
+  </div>
+  <p>Named the practice and the payoff, always before 13:00 &mdash; earliest 09:32, latest 12:59. The only kind that ever mentioned a length in the title (<i>Focus Breathing | 4 Mins</i>).</p>
+  <div class="cards">
+<article class="card real">
+  <header class="card-head">
+    <span class="when">29/07 &middot; 12:31</span>
+    <span class="deliv"><b>5,332</b> of 5,353</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Start FOCUS BREATHING</span>
+      <span class="notif-body">Recharge with the power of your breath. 🌬️</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">28/07 &middot; 11:06</span>
+    <span class="deliv"><b>5,296</b> of 5,335</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Start Focus Breathing | 4 Mins</span>
+      <span class="notif-body">Breathe in calm. Breathe out stress.</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">03/07 &middot; 11:34</span>
+    <span class="deliv"><b>2,511</b> of 2,572</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Start your day with mindful breathing. 🌿</span>
+      <span class="notif-body">Start a Focus Breathing Session</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">26/06 &middot; 09:32</span>
+    <span class="deliv"><b>2,172</b> of 2,196</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Begin your morning with Focus Breathing 🌬️</span>
+      <span class="notif-body">Clear your mind. Sharpen your focus.</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">23/06 &middot; 11:26</span>
+    <span class="deliv"><b>2,066</b> of 2,097</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Less stress. More focus.</span>
+      <span class="notif-body">Take a pause with Focus Breathing</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">22/06 &middot; 12:59</span>
+    <span class="deliv"><b>2,036</b> of 2,057</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Quick Reset</span>
+      <span class="notif-body">Start a Breathing Session Now</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+  </div>
+</div>
+<div class="kind" style="--hue:#5fb0c9">
+  <div class="kind-head">
+    <h3>Sound &mdash; Om and Escape</h3>
+    <span class="kind-n">9 of 41</span>
+    <span class="kind-slot">afternoon_soundscape &middot; 14:00 &nbsp;/&nbsp; evening_soundscape &middot; 19:00</span>
+  </div>
+  <p>Two soundtracks carried all nine: Om (5) and Escape (4). Spread across the whole day, 10:05 to 21:24. The verb is always listen or play, never follow &mdash; there is no voice in these.</p>
+  <div class="cards">
+<article class="card real">
+  <header class="card-head">
+    <span class="when">10/08 &middot; 14:38</span>
+    <span class="deliv"><b>5,776</b> of 6,031</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Reset your mind with Om. 🕉️</span>
+      <span class="notif-body">Tap to start.</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">02/08 &middot; 21:24</span>
+    <span class="deliv"><b>5,522</b> of 5,646</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Find calm before you sleep. 🌙</span>
+      <span class="notif-body">Chant Om now.</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">29/07 &middot; 10:05</span>
+    <span class="deliv"><b>5,332</b> of 5,384</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Let soothing sounds follow you through the day. 🎶</span>
+      <span class="notif-body">Press play.</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">26/07 &middot; 15:36</span>
+    <span class="deliv"><b>5,215</b> of 5,349</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Pause the noise. Embrace the melody. 🌙</span>
+      <span class="notif-body">Listen to Escape.</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">22/07 &middot; 11:08</span>
+    <span class="deliv"><b>5,030</b> of 5,063</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Let the sound of Om quiet your mind.</span>
+      <span class="notif-body">Listen now.</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">11/07 &middot; 20:13</span>
+    <span class="deliv"><b>4,306</b> of 4,332</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Quick Relax &amp; Restoration</span>
+      <span class="notif-body">Play Escape Sound Healing 🎶</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">11/07 &middot; 16:05</span>
+    <span class="deliv"><b>4,299</b> of 4,396</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Let the sound of Om help you unwind. 🌙</span>
+      <span class="notif-body">Start the healing | Play</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">09/07 &middot; 17:00</span>
+    <span class="deliv"><b>3,991</b> of 4,055</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Take a break from the noise. 🌙</span>
+      <span class="notif-body">Press play on Escape.</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">08/07 &middot; 17:25</span>
+    <span class="deliv"><b>3,682</b> of 3,694</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Need a moment of peace? 🌿</span>
+      <span class="notif-body">Listen to Escape | Play Now</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+  </div>
+</div>
+<div class="kind" style="--hue:#8a6fd6">
+  <div class="kind-head">
+    <h3>Yog Nidra</h3>
+    <span class="kind-n">11 of 41</span>
+    <span class="kind-slot">morning_focus &middot; 10:00 &nbsp;/&nbsp; evening_meditation &middot; 17:00</span>
+  </div>
+  <p>The most-pushed thing in the app: 11 of 41, from 12:25 to 21:47. Body copy is nearly always the same sentence &mdash; <i>Start Yog Nidra Session</i> &mdash; with the whole variation carried by the title.</p>
+  <div class="cards">
+<article class="card real">
+  <header class="card-head">
+    <span class="when">27/07 &middot; 17:31</span>
+    <span class="deliv"><b>5,253</b> of 5,326</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Relax. Breathe. Unwind. 🤍</span>
+      <span class="notif-body">Begin your Yog Nidra session.</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">21/07 &middot; 13:57</span>
+    <span class="deliv"><b>4,988</b> of 5,099</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Relax your body. Quiet your mind. 💙</span>
+      <span class="notif-body">Start your Yog Nidra.</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">17/07 &middot; 19:25</span>
+    <span class="deliv"><b>4,819</b> of 5,002</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Let go of stress.</span>
+      <span class="notif-body">Tap To Begin - Yog Nidra Session</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">09/07 &middot; 19:02</span>
+    <span class="deliv"><b>3,999</b> of 4,010</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Relax your body. Calm your mind. 🤍</span>
+      <span class="notif-body">Start Yog Nidra Session | Play</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">08/07 &middot; 15:40</span>
+    <span class="deliv"><b>3,681</b> of 3,746</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Calm Your Mind 🌙</span>
+      <span class="notif-body">Start Yog Nidra Session</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">06/07 &middot; 21:12</span>
+    <span class="deliv"><b>3,069</b> of 3,179</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Deeply relax 🌙</span>
+      <span class="notif-body">Start Yog Nidra Session | Play</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">01/07 &middot; 16:19</span>
+    <span class="deliv"><b>2,404</b> of 2,525</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Pause. Breathe. Restore. 🌿</span>
+      <span class="notif-body">Start Yog Nidra Session | Click Here</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">25/06 &middot; 18:42</span>
+    <span class="deliv"><b>2,152</b> of 2,227</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Start Yog Nidra Session 🌘</span>
+      <span class="notif-body">Take 10 minutes for yourself</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">24/06 &middot; 12:25</span>
+    <span class="deliv"><b>2,106</b> of 2,145</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Say Yes to 10 mins of Peace</span>
+      <span class="notif-body">Start Yog Nidra Session</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">23/06 &middot; 21:06</span>
+    <span class="deliv"><b>2,079</b> of 2,116</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Racing Thought ?</span>
+      <span class="notif-body">Start Yog Nidra Session</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">21/06 &middot; 19:22</span>
+    <span class="deliv"><b>2,004</b> of 3,891</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Calm Your Mind</span>
+      <span class="notif-body">Start Yog Nidra Session</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span><span class="mark warn">token purge</span></div>
+</article>
+  </div>
+</div>
+<div class="kind" style="--hue:#c98f6a">
+  <div class="kind-head">
+    <h3>Evening wind-down</h3>
+    <span class="kind-n">6 of 41</span>
+    <span class="kind-slot">evening_meditation &middot; 17:00</span>
+  </div>
+  <p>A tight 16:00&ndash;20:30 band. Slower verbs than the rest &mdash; slow down, unwind, restore &mdash; and the one kind that names the time of day in the copy itself.</p>
+  <div class="cards">
+<article class="card real">
+  <header class="card-head">
+    <span class="when">21/07 &middot; 17:09</span>
+    <span class="deliv"><b>4,988</b> of 5,010</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Slow Down A Little</span>
+      <span class="notif-body">Start a short Evening Wind Down Session</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">07/07 &middot; 16:25</span>
+    <span class="deliv"><b>3,419</b> of 3,471</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Start A Wind Down Session</span>
+      <span class="notif-body">Pause. Breathe. Relax. ✨</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">01/07 &middot; 19:47</span>
+    <span class="deliv"><b>2,418</b> of 2,432</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Time to unwind. 🌙</span>
+      <span class="notif-body">Evening Wind Down | Click Here</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">26/06 &middot; 18:42</span>
+    <span class="deliv"><b>2,190</b> of 2,245</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Time to Wind Down</span>
+      <span class="notif-body">Start Wind Down Session | Tap Here</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">24/06 &middot; 20:30</span>
+    <span class="deliv"><b>2,118</b> of 2,144</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">🌙 Time to slow down.</span>
+      <span class="notif-body">Calm night begins with a gentle wind-down routine.</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">22/06 &middot; 17:54</span>
+    <span class="deliv"><b>2,048</b> of 2,079</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Evening Wind Down</span>
+      <span class="notif-body">Relax | Guided Session | Start Now</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+  </div>
+</div>
+<div class="kind" style="--hue:#6f79d6">
+  <div class="kind-head">
+    <h3>Night nidra and sleep</h3>
+    <span class="kind-n">6 of 41</span>
+    <span class="kind-slot">night_nidra &middot; 21:30</span>
+  </div>
+  <p>Never before 21:47, five of six after 22:00. Names the sleep session outright &mdash; Sleep Onset, Stress Relief, Deep Healing &mdash; or drops the name entirely for <i>It&rsquo;s time to rest.</i></p>
+  <div class="cards">
+<article class="card real">
+  <header class="card-head">
+    <span class="when">29/07 &middot; 22:11</span>
+    <span class="deliv"><b>5,342</b> of 5,375</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Tap To Sleep Now</span>
+      <span class="notif-body">Start Sleep Onset Nidra Session</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">18/07 &middot; 22:22</span>
+    <span class="deliv"><b>4,893</b> of 4,949</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Start Stress Relief Nidra</span>
+      <span class="notif-body">Sleep Better Tonight</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">27/06 &middot; 22:40</span>
+    <span class="deliv"><b>2,245</b> of 2,282</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">It&#x27;s time to rest. 🤍</span>
+      <span class="notif-body">Play and let Nidra do the rest.</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">26/06 &middot; 22:21</span>
+    <span class="deliv"><b>2,192</b> of 2,215</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">It&#x27;s time to rest. 🤍</span>
+      <span class="notif-body">Play and let Nidra do the rest.</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">22/06 &middot; 21:47</span>
+    <span class="deliv"><b>2,049</b> of 2,070</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Deep Healing Nidra</span>
+      <span class="notif-body">Start Now for a Deep Sleep</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">21/06 &middot; 22:43</span>
+    <span class="deliv"><b>1,995</b> of 2,025</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">🌙 Ready For a Deep Sleep!</span>
+      <span class="notif-body">Start | Sleep Onset Nidra</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+  </div>
+</div>
+<div class="kind" style="--hue:#e0b64c">
+  <div class="kind-head">
+    <h3>Live group session</h3>
+    <span class="kind-n">2 of 41</span>
+    <span class="kind-slot none">no slot in this pipeline</span>
+  </div>
+  <p>Both pointed at a live 30-minute breathing session &mdash; one a same-day heads-up at 13:16, one the <i>join now</i> at 18:58. Event copy, sent in a pair, and the deep link is a group, not a player.</p>
+  <div class="cards">
+<article class="card real">
+  <header class="card-head">
+    <span class="when">23/07 &middot; 18:58</span>
+    <span class="deliv"><b>5,108</b> of 5,138</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">LIVE: 30min Breathing session</span>
+      <span class="notif-body">Join Now 30min breathing session live</span>
+    </div>
+  </div>
+  
+</article>
+<article class="card real">
+  <header class="card-head">
+    <span class="when">23/07 &middot; 13:16</span>
+    <span class="deliv"><b>5,098</b> of 5,155</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">Upcoming 30min Breathing Session Today</span>
+      <span class="notif-body">Join Group for live breathing session today evening</span>
+    </div>
+  </div>
+  
+</article>
+  </div>
+</div>
+<div class="kind" style="--hue:#e0b64c">
+  <div class="kind-head">
+    <h3>Sleep log</h3>
+    <span class="kind-n">1 of 41</span>
+    <span class="kind-slot none">no slot in this pipeline</span>
+  </div>
+  <p>One push, 09:38, asking a question the app can answer for itself. The only send that asked for input rather than offering a session.</p>
+  <div class="cards">
+<article class="card real">
+  <header class="card-head">
+    <span class="when">22/06 &middot; 09:38</span>
+    <span class="deliv"><b>2,010</b> of 2,040</span>
+  </header>
+  <div class="notif">
+    <div class="notif-icon" aria-hidden="true"></div>
+    <div class="notif-text">
+      <span class="notif-app">Nidra</span>
+      <span class="notif-title">How did you sleep last night ?</span>
+      <span class="notif-body">Record your sleep | Click Here</span>
+    </div>
+  </div>
+  <div class="marks"><span class="mark img">image</span></div>
+</article>
+  </div>
+</div>
+
+  <div class="kind">
+    <div class="kind-head"><h3>Two sentence shapes, three flavours</h3><span class="kind-n">shipped copy</span></div>
+    <p>Strip the session names out and every one of the 41 pushes is one of two shapes. The
+    flavours below sit inside the first one and recur often enough to be house style &mdash; the
+    rewrite keeps one, drops another, and cannot reproduce the second shape at all.</p>
+    <ul class="shapes">
+    <li><span class="shape-name">Shape 1 &mdash; benefit, then the tap <span>&middot; 30 of 41</span></span><q>Let go of stress. — Tap To Begin - Yog Nidra Session</q><p>The house default, and the shape the new bank inherits: title earns the read, body spends it on one instruction. Only two sends fit neither shape, both of them evening wind-down copy with no instruction at all.</p></li>
+    <li><span class="shape-name">Shape 2 &mdash; the session name is the whole title <span>&middot; 9 of 41</span></span><q>Deep Healing Nidra — Start Now for a Deep Sleep</q><p>Works because members already know these names. The bank now opens 45 of its 200 titles with the session — the same 22% share — but never bare: {item} has to read for every item the slot can serve, so it always sits in a phrase.</p></li>
+    <li><span class="shape-name">Flavour &mdash; staccato commands <span>&middot; 6 of 41</span></span><q>Relax. Breathe. Unwind. 🤍 — Begin your Yog Nidra session.</q><p>Three one-word orders, then the session. The closest the old copy came to the new voice.</p></li>
+    <li><span class="shape-name">Flavour &mdash; stacked pipe CTA <span>&middot; 10 of 41</span></span><q>Time to unwind. 🌙 — Evening Wind Down | Click Here</q><p>A pipe standing in for a button. Reads as UI, not speech — the rewrite drops it.</p></li>
+    <li><span class="shape-name">Flavour &mdash; straight question <span>&middot; 3 of 41</span></span><q>Racing Thought ? — Start Yog Nidra Session</q><p>Rare, and each one is a symptom the session answers. Two carry a stray space before the question mark.</p></li>
+    </ul>
+  </div>
+
+  <div class="kind">
+    <div class="kind-head"><h3>The verbs they actually used</h3><span class="kind-n">across 41 sends</span></div>
+    <p>Every push ended in an instruction, and the vocabulary is narrow. <i>Start</i> alone carries
+    more than half of them. The new bank leans on play, take and stop instead &mdash; the same register,
+    a wider set of words, and no <i>Click Here</i>.</p>
+    <ul class="verbs"><li>Start <b>23</b></li><li>Play <b>9</b></li><li>Tap <b>4</b></li><li>Begin <b>4</b></li><li>Take <b>3</b></li><li>Listen <b>3</b></li><li>Click Here <b>3</b></li><li>Press play <b>2</b></li><li>Join <b>2</b></li><li>Record <b>1</b></li></ul>
+  </div>
+
+  <p class="note">Five of the seven kinds already have a slot, and between them they cover 38 of the
+  41 sends. The two that do not &mdash; the live-session pair and the sleep-log ask &mdash; are the
+  only things in seven weeks of pushing that this pipeline cannot send at all, because both deep-link
+  somewhere other than a player screen. They stay a manual job.</p>
+</section>
+
+<footer class="page-foot">
+  <p>Generated from <code>config/copybank.json</code> by <code>scripts/build-review-page.ts</code>.
+  Decisions are per-reviewer and never published back into this page &mdash; they travel by copy and
+  paste, so two people reviewing at once cannot overwrite each other.</p>
+</footer>
+<script id="app-js">/* Copy-bank sign-off. Renders every variant from the embedded bank, records an
+   accept / reject verdict per variant, and saves those verdicts back into the
+   artifact so everyone (including Claude) reads the same list.
+
+   Two layers of state, and the split matters:
+   - SHARED — the verdicts embedded in this published version, by everyone.
+   - EDITS  — only the ids THIS viewer changed and has not published yet, kept in
+              localStorage so a reload does not lose a review half-done.
+
+   Decisions never leave this browser on their own: the button copies them as
+   text to paste into Slack or a message. An earlier version published them back
+   into the artifact, which meant any stale tab could overwrite everyone else's
+   verdicts wholesale — the timestamp moved and the list snapped back. Copy-out
+   has no such failure mode, and no writer permissions to get wrong. */
+const bank = JSON.parse(document.getElementById('bank').textContent);
+const saved = JSON.parse(document.getElementById('verdicts').textContent);
+const EDITS_KEY = 'nidra-copybank-edits-v3';
+/** An edit with this value removes a shared verdict on the next save. */
+const CLEARED = 'clear';
+
+let shared = saved.verdicts || {};
+let edits = readEdits();
+let filter = 'all';
+
+function readEdits() {
+  try {
+    const raw = localStorage.getItem(EDITS_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    // Private windows and blocked site data both throw. The page still works;
+    // it just cannot remember unpublished edits across a reload.
+    return {};
+  }
+}
+function writeEdits() {
+  try {
+    localStorage.setItem(EDITS_KEY, JSON.stringify(edits));
+  } catch {}
+}
+
+/** The verdict a viewer sees: their own edit if they made one, else the shared one. */
+function verdictOf(id) {
+  const mine = edits[id];
+  if (mine === CLEARED) return undefined;
+  return mine || shared[id];
+}
+
+/** SHARED with this viewer's edits applied — what a save publishes. */
+function merged() {
+  const out = { ...shared };
+  for (const [id, v] of Object.entries(edits)) {
+    if (v === CLEARED) delete out[id];
+    else out[id] = v;
+  }
+  return out;
+}
+
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const tokens = (s) =>
+  esc(s)
+    .replace(/\{item\}/g, '<span class="tok">item</span>')
+    .replace(/\{min\}/g, '<span class="tok">min</span>');
+
+/* ── render ─────────────────────────────────────────────────────────────── */
+function slotHtml(slot) {
+  const options = slot.items
+    .map(([title, min]) => `<option value="${esc(title)}|${min}">${esc(title)} &middot; ${min} min</option>`)
+    .join('');
+  const cards = slot.variants
+    .map(
+      (v) => `<article class="card" id="${v.id}" data-id="${v.id}">
+      <header class="card-head">
+        <code class="vid">${v.id}</code>
+        <span class="state" aria-live="polite"></span>
+      </header>
+      <div class="notif">
+        <div class="notif-icon" aria-hidden="true"></div>
+        <div class="notif-text">
+          <span class="notif-app">Nidra</span>
+          <span class="notif-title" data-raw="${esc(v.title)}">${tokens(v.title)}</span>
+          <span class="notif-body" data-raw="${esc(v.body)}">${tokens(v.body)}</span>
+        </div>
+      </div>
+      <div class="verdict">
+        <button class="btn accept" data-act="accept" aria-pressed="false">Accept</button>
+        <button class="btn reject" data-act="reject" aria-pressed="false">Reject</button>
+      </div>
+    </article>`,
+    )
+    .join('\n');
+  return `<section class="slot" style="--hue:${slot.hue}" data-slot="${slot.key}">
+    <div class="slot-head">
+      <div class="slot-id">
+        <span class="slot-time">${slot.at}</span>
+        <code class="slot-key">${slot.key}</code>
+      </div>
+      <div class="slot-about">
+        <h2>${esc(slot.name)}</h2>
+        <p>${esc(slot.about)}</p>
+      </div>
+      <label class="picker">Read it as
+        <select class="sub-picker">
+          <option value="">show tokens</option>
+          ${options}
+        </select>
+      </label>
+    </div>
+    <div class="cards">
+${cards}
+    </div>
+  </section>`;
+}
+
+document.getElementById('slots').innerHTML = bank.slots.map(slotHtml).join('\n');
+
+// Scoped to the rendered bank: the send-history section further down reuses the
+// .card class for shipped copy, which carries no verdict.
+const cards = [...document.querySelectorAll('#slots .card')];
+const chips = [...document.querySelectorAll('.chip[data-filter]')];
+
+function paint() {
+  let acc = 0;
+  let rej = 0;
+  const dirty = Object.keys(edits).length;
+  cards.forEach((card) => {
+    const id = card.dataset.id;
+    const verdict = verdictOf(id);
+    if (verdict === 'accept') acc++;
+    if (verdict === 'reject') rej++;
+    card.classList.toggle('accepted', verdict === 'accept');
+    card.classList.toggle('rejected', verdict === 'reject');
+    card.classList.toggle('is-dirty', id in edits);
+    card.querySelector('.state').textContent =
+      verdict === 'accept' ? 'accepted' : verdict === 'reject' ? 'rejected' : '';
+    card.querySelectorAll('.verdict .btn').forEach((btn) => {
+      btn.setAttribute('aria-pressed', String(verdict === btn.dataset.act));
+    });
+    const show =
+      filter === 'all' ||
+      (filter === 'accepted' && verdict === 'accept') ||
+      (filter === 'rejected' && verdict === 'reject') ||
+      (filter === 'undecided' && !verdict);
+    card.classList.toggle('is-hidden', !show);
+  });
+
+  document.querySelectorAll('#slots .slot').forEach((slot) => {
+    slot.classList.toggle('is-empty', slot.querySelectorAll('.card:not(.is-hidden)').length === 0);
+  });
+
+  const ids = (want) => cards.filter((c) => verdictOf(c.dataset.id) === want).map((c) => c.dataset.id);
+  const accIds = ids('accept');
+  const rejIds = ids('reject');
+  document.querySelectorAll('.n-acc').forEach((el) => (el.textContent = acc));
+  document.querySelectorAll('.n-rej').forEach((el) => (el.textContent = rej));
+  document.querySelectorAll('.n-und').forEach((el) => (el.textContent = cards.length - acc - rej));
+  document.querySelector('.out-acc').textContent = accIds.length ? accIds.join('\n') : 'none yet';
+  document.querySelector('.out-rej').textContent = rejIds.length ? rejIds.join('\n') : 'none yet';
+
+  const decided = acc + rej;
+  const save = document.querySelector('.save');
+  save.textContent = decided ? `Copy my ${decided} decisions` : 'Copy my decisions';
+  save.disabled = decided === 0;
+  document.querySelector('.discard').hidden = dirty === 0;
+  document.querySelector('.saved-at').textContent =
+    'kept in this browser only — copy them out when you are done';
+}
+
+/* ── interaction ────────────────────────────────────────────────────────── */
+document.getElementById('slots').addEventListener('click', (e) => {
+  const btn = e.target.closest('.verdict .btn');
+  if (!btn) return;
+  const id = btn.closest('.card').dataset.id;
+  const act = btn.dataset.act;
+  // Clicking the standing verdict again clears it, so a misclick is one tap to
+  // undo. Clearing a verdict that is already SHARED needs a tombstone, or the
+  // merge would simply put it back.
+  if (verdictOf(id) === act) edits[id] = shared[id] === act ? CLEARED : undefined;
+  else edits[id] = act;
+  if (edits[id] === undefined || edits[id] === shared[id]) delete edits[id];
+  writeEdits();
+  paint();
+});
+
+chips.forEach((chip) => {
+  chip.addEventListener('click', () => {
+    chips.forEach((c) => c.classList.toggle('is-on', c === chip));
+    filter = chip.dataset.filter;
+    paint();
+  });
+});
+
+document.querySelector('.discard').addEventListener('click', () => {
+  // Drops only this viewer's unpublished edits — never anything already shared.
+  edits = {};
+  writeEdits();
+  paint();
+});
+
+document.getElementById('slots').addEventListener('change', (e) => {
+  const picker = e.target.closest('.sub-picker');
+  if (!picker) return;
+  const [item, mins] = picker.value ? picker.value.split('|') : ['', ''];
+  picker
+    .closest('.slot')
+    .querySelectorAll('.notif-title, .notif-body')
+    .forEach((el) => {
+      const raw = el.dataset.raw;
+      el.innerHTML = item
+        ? esc(raw)
+            .replace(/\{item\}/g, `<span class="subbed">${esc(item)}</span>`)
+            .replace(/\{min\}/g, `<span class="subbed">${mins}</span>`)
+        : tokens(raw);
+    });
+});
+
+/* ── copying out: the decisions leave as text, nothing is published ─────── */
+const label = (id) => {
+  const card = document.getElementById(id);
+  return card ? card.querySelector('.notif-title').dataset.raw : id;
+};
+
+/** The shareable report. Ids first so they can be pasted straight back to me. */
+function report() {
+  const all = merged();
+  const acc = Object.keys(all).filter((id) => all[id] === 'accept').sort();
+  const rej = Object.keys(all).filter((id) => all[id] === 'reject').sort();
+  const lines = [
+    `Nidra push copy bank — decisions (${stamp()})`,
+    `${acc.length} accepted · ${rej.length} rejected · ${cards.length - acc.length - rej.length} undecided of ${cards.length}`,
+  ];
+  for (const [head, ids] of [['ACCEPTED', acc], ['REJECTED', rej]]) {
+    if (!ids.length) continue;
+    lines.push('', `${head} (${ids.length})`, ...ids.map((id) => `${id}  ${label(id)}`));
+  }
+  return lines.join('\n');
+}
+
+function stamp() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+const status = document.querySelector('.save-status');
+function say(msg, kind) {
+  status.textContent = msg;
+  status.className = `save-status${kind ? ' is-' + kind : ''}`;
+}
+
+/**
+ * Two ways out, because a sandboxed frame may refuse both: the async clipboard
+ * API, then a hidden textarea with execCommand. If neither works the text is
+ * selected in place so the reader can copy it by hand.
+ */
+async function copyOut(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return 'clipboard';
+  } catch {}
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:-1000px;opacity:0';
+    document.body.append(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    if (ok) return 'exec';
+  } catch {}
+  return null;
+}
+
+document.querySelector('.save').addEventListener('click', async () => {
+  const text = report();
+  const how = await copyOut(text);
+  if (how) {
+    say('Copied. Paste it into Slack or a message.', 'ok');
+  } else {
+    // Put it on screen and select it — a manual copy still gets the job done.
+    const pre = document.querySelector('.out-report');
+    pre.textContent = text;
+    pre.hidden = false;
+    const range = document.createRange();
+    range.selectNodeContents(pre);
+    getSelection().removeAllRanges();
+    getSelection().addRange(range);
+    say('Copying was blocked here — the selected text below is ready for Cmd-C.', 'warn');
+  }
+});
+
+paint();
+</script>
+</body>
+</html>

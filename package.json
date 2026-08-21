@@ -1,0 +1,14 @@
+{
+  "name": "nidra-daily-push",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "plan": "bun run scripts/plan.ts",
+    "execute": "bun run scripts/execute.ts",
+    "validate": "bun run scripts/validate-copybank.ts",
+    "build-review": "bun run scripts/build-review-page.ts"
+  },
+  "devDependencies": {
+    "bun-types": "^1.1.0"
+  }
+}

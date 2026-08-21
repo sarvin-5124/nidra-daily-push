@@ -1,0 +1,89 @@
+name: execute-slot
+
+# Script 2 — sends one slot's broadcast. Cron times are UTC, IST minus 5:30:
+#   04:30 → 10:00 IST   morning_focus
+#   08:30 → 14:00 IST   afternoon_soundscape
+#   11:30 → 17:00 IST   evening_meditation
+#   13:30 → 19:00 IST   evening_soundscape
+#   16:00 → 21:30 IST   night_nidra
+# The script picks the slot from the wall clock, waits out that slot's jitter,
+# then sends — so GitHub's own cron lag (5–15 min is normal) is absorbed rather
+# than compounded.
+on:
+  schedule:
+    - cron: '30 4 * * *'
+    - cron: '30 8 * * *'
+    - cron: '30 11 * * *'
+    - cron: '30 13 * * *'
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: 'Slot key to send now (skips slot resolution).'
+        required: false
+        type: choice
+        options:
+          - ''
+          - morning_focus
+          - afternoon_soundscape
+          - evening_meditation
+          - evening_soundscape
+          - night_nidra
+      date:
+        description: 'IST schedule date (YYYY-MM-DD). Blank = today.'
+        required: false
+        type: string
+      audience_mode:
+        description: 'Who receives it. single_user sends to one id only and does NOT mark the slot sent.'
+        required: true
+        default: schedule
+        type: choice
+        options:
+          - schedule
+          - single_user
+      user_id:
+        description: 'User id for single_user mode. Required when audience_mode is single_user.'
+        required: false
+        type: string
+
+concurrency:
+  group: nidra-execute
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    # Covers up to 30 min of jitter wait + send + 10 min of campaign polling.
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Send slot
+        env:
+          NIDRA_API_URL: ${{ vars.NIDRA_API_URL }}
+          NIDRA_ADMIN_USER: ${{ secrets.NIDRA_ADMIN_USER }}
+          NIDRA_ADMIN_PASS: ${{ secrets.NIDRA_ADMIN_PASS }}
+          NTFY_BASE: ${{ vars.NTFY_BASE }}
+          NTFY_TOPIC_OK: ${{ vars.NTFY_TOPIC_OK }}
+          NTFY_TOPIC_FAIL: ${{ vars.NTFY_TOPIC_FAIL }}
+          NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+          FAIL_RATE_ALERT: ${{ vars.FAIL_RATE_ALERT }}
+          SLOT_KEY: ${{ inputs.slot }}
+          # Cron runs carry no inputs, so both default to the scheduled audience.
+          AUDIENCE_MODE: ${{ inputs.audience_mode }}
+          TEST_USER_ID: ${{ inputs.user_id }}
+          SCHEDULE_DATE: ${{ inputs.date }}
+        run: bun run scripts/execute.ts
+
+      - name: Commit result
+        # Runs even on failure: a failed attempt is written back too, and that
+        # record is what stops a rerun from double-sending.
+        if: always()
+        run: bash .github/scripts/commit-schedules.sh "chore: record send result"

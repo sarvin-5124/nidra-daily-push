@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "tz": "Asia/Kolkata",
+  "sentBy": "gha-daily-push",
+  "audience": { "mode": "all" },
+  "jitterMinutes": { "min": 5, "max": 30 },
+  "routeTemplate": "/(app)/player/{id}?source=push_daily",
+  "slots": [
+    {
+      "key": "morning_focus",
+      "at": "10:00",
+      "copySlot": "morning_focus",
+      "pool": { "kind": "meditations", "include": ["med-focus-breathing", "med-yognidra"] }
+    },
+    {
+      "key": "afternoon_soundscape",
+      "at": "14:00",
+      "copySlot": "afternoon_soundscape",
+      "pool": { "kind": "soundscapes" }
+    },
+    {
+      "key": "evening_meditation",
+      "at": "17:00",
+      "copySlot": "evening_meditation",
+      "pool": { "kind": "meditations", "excludeSlots": ["morning_focus"] }
+    },
+    {
+      "key": "evening_soundscape",
+      "at": "19:00",
+      "copySlot": "evening_soundscape",
+      "pool": { "kind": "soundscapes", "excludeSlots": ["afternoon_soundscape"] }
+    },
+    {
+      "key": "night_nidra",
+      "at": "21:30",
+      "copySlot": "night_nidra",
+      "pool": { "kind": "sessions", "exclude": ["power-nap"] }
+    }
+  ]
+}

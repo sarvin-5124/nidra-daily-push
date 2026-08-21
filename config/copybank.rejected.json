@@ -1,0 +1,201 @@
+{
+  "note": "Rejected in review 2026-08-21; removed from copybank.json. Ids are not reused.",
+  "rejectedAt": "2026-08-21",
+  "slots": {
+    "morning_focus": [
+      {
+        "id": "mf-15",
+        "title": "You have worked since morning",
+        "body": "Take a break now. Rest first, work better after."
+      },
+      {
+        "id": "mf-17",
+        "title": "Leave your desk for {min} minutes",
+        "body": "Sit somewhere comfortable, start {item}, and relax."
+      },
+      {
+        "id": "mf-19",
+        "title": "{item} beats pushing through",
+        "body": "Your work needs a calm mind more than a busy one."
+      },
+      {
+        "id": "mf-24",
+        "title": "Check your shoulders",
+        "body": "They are up near your ears. Start {item} and let them drop."
+      },
+      {
+        "id": "mf-26",
+        "title": "{item} before your next meeting",
+        "body": "You will walk in calmer than you would have otherwise."
+      },
+      {
+        "id": "mf-29",
+        "title": "Half the morning is gone 🌄",
+        "body": "Stop here, start {item}, then pick the day back up."
+      },
+      {
+        "id": "mf-33",
+        "title": "Get off the screen 🍃",
+        "body": "Your eyes need a break. Close them and start {item}."
+      }
+    ],
+    "afternoon_soundscape": [
+      {
+        "id": "as-01",
+        "title": "Sleepy after lunch? 🍃",
+        "body": "Normal. Play {item} and ride it out instead of fighting it."
+      },
+      {
+        "id": "as-02",
+        "title": "Play {item} while you work",
+        "body": "Steady sound in the background makes the afternoon lighter."
+      },
+      {
+        "id": "as-09",
+        "title": "Heavy lunch, heavy eyes 🌊",
+        "body": "Happens to everyone. Play {item} instead of one more coffee."
+      },
+      {
+        "id": "as-10",
+        "title": "Headphones on, shoulders down",
+        "body": "Play {item} and the afternoon feels easier to sit through."
+      },
+      {
+        "id": "as-13",
+        "title": "Not a nap, just a pause ✨",
+        "body": "Play {item} for {min} minutes, eyes open or closed."
+      },
+      {
+        "id": "as-14",
+        "title": "Let that email wait 🌿",
+        "body": "Play {item} first. Then open the inbox."
+      },
+      {
+        "id": "as-34",
+        "title": "{item} suits work and rest",
+        "body": "Let it play, and decide which one you are doing as you go."
+      }
+    ],
+    "evening_meditation": [
+      {
+        "id": "em-01",
+        "title": "Close out your workday 🍃",
+        "body": "Start {item} and put a full stop on it."
+      },
+      {
+        "id": "em-02",
+        "title": "Switch off work now",
+        "body": "Start {item}. {min} minutes between the desk and home."
+      },
+      {
+        "id": "em-18",
+        "title": "Draw a line under work",
+        "body": "Start {item} now, or the day follows you into the night."
+      },
+      {
+        "id": "em-29",
+        "title": "Keep the phone down ✨",
+        "body": "Start {item} instead. A screen-free stretch helps far more."
+      },
+      {
+        "id": "em-35",
+        "title": "The hardest hour to rest ✨",
+        "body": "Which is why starting {item} now is worth more than later."
+      }
+    ],
+    "evening_soundscape": [
+      {
+        "id": "es-02",
+        "title": "Play {item} while you cook",
+        "body": "Put it on, and the kitchen feels completely different."
+      },
+      {
+        "id": "es-05",
+        "title": "Take the edge off tonight",
+        "body": "Play {item} for a while. No screen needed."
+      },
+      {
+        "id": "es-06",
+        "title": "Play {item} on the way home 🌇",
+        "body": "Headphones on, and the traffic bothers you less."
+      },
+      {
+        "id": "es-10",
+        "title": "You do not need more input",
+        "body": "Play {item}. Steady sound, nothing to watch or follow."
+      },
+      {
+        "id": "es-11",
+        "title": "Let the day thin out 🌌",
+        "body": "Play {item} and the edges go soft."
+      },
+      {
+        "id": "es-12",
+        "title": "{item} is tonight's answer",
+        "body": "A quieter one than the usual scroll."
+      },
+      {
+        "id": "es-14",
+        "title": "Make the chores easier 🌿",
+        "body": "Play {item} while you finish up. The routine stops feeling heavy."
+      },
+      {
+        "id": "es-17",
+        "title": "Make it {item} tonight 🌙",
+        "body": "Speaker or headphones, no attention needed."
+      },
+      {
+        "id": "es-19",
+        "title": "Wash the day off 🌊",
+        "body": "Play {item} for {min} minutes. It does that for your head."
+      },
+      {
+        "id": "es-22",
+        "title": "Nobody asked you to rest",
+        "body": "Do it anyway. {min} minutes of {item}, your choice."
+      },
+      {
+        "id": "es-28",
+        "title": "Fill the room with {item} 🌊",
+        "body": "It works on a speaker or in headphones, no difference."
+      },
+      {
+        "id": "es-29",
+        "title": "Play the usual {item} tonight",
+        "body": "Nothing new to work out. Just open it and press play."
+      },
+      {
+        "id": "es-35",
+        "title": "End the day with sound 🌇",
+        "body": "Not with a screen. Play {item} and let today finish."
+      },
+      {
+        "id": "es-37",
+        "title": "Nothing to watch here 🌿",
+        "body": "Play {item}. It works with eyes closed or hands busy."
+      },
+      {
+        "id": "es-38",
+        "title": "Turn the volume up a little",
+        "body": "Let {item} fill the next stretch of the evening."
+      }
+    ],
+    "night_nidra": [
+      {
+        "id": "nn-03",
+        "title": "{item}, then sleep",
+        "body": "Give it {min} minutes. The rest of tonight looks after itself."
+      },
+      {
+        "id": "nn-27",
+        "title": "For nights that feel long ✨",
+        "body": "Start {item}. {min} slow minutes, until the night feels smaller."
+      },
+      {
+        "id": "nn-30",
+        "title": "Start {item}, not the clock",
+        "body": "Get comfortable and let the time go by itself."
+      }
+    ]
+  }
+}
