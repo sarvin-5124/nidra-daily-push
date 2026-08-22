@@ -106,14 +106,24 @@ export async function getCampaign(id: string): Promise<Campaign> {
  * Polls a campaign to a terminal status. The backend fans out in a background
  * goroutine, so an accepted send says nothing about delivery — only the
  * campaign doc does.
+ *
+ * Each poll is a Firestore read (GetAdminCampaign) on the backend. Every
+ * historical campaign lands on "partial", never "completed" — see
+ * push-send-history-signals.md — so this loop routinely runs its full course
+ * rather than exiting on the first or second tick. Backing off from 5s to a
+ * 20s cap instead of polling flat at 5s cuts that read count (worst case
+ * 120/slot at a flat 5s over the 10min timeout, ~31/slot at a 20s cap) without
+ * slowing detection of the common fast-finishing sends, which still get an
+ * early poll at 5s/15s.
  */
 export async function waitForCampaign(
   id: string,
-  { timeoutMs = 10 * 60_000, intervalMs = 5_000 } = {},
+  { timeoutMs = 10 * 60_000, intervalMs = 5_000, maxIntervalMs = 20_000 } = {},
 ): Promise<Campaign> {
   const terminal = new Set(["completed", "partial", "failed"]);
   const deadline = Date.now() + timeoutMs;
   let last: Campaign | null = null;
+  let delay = intervalMs;
   while (Date.now() < deadline) {
     try {
       last = await getCampaign(id);
@@ -125,7 +135,8 @@ export async function waitForCampaign(
       // A transient poll failure is not a send failure — keep polling.
       console.warn(`[campaign ${id}] poll error: ${(e as Error).message}`);
     }
-    await new Promise((r) => setTimeout(r, intervalMs));
+    await new Promise((r) => setTimeout(r, delay));
+    delay = Math.min(delay * 2, maxIntervalMs);
   }
   throw new Error(
     `campaign ${id} did not reach a terminal status within ${Math.round(timeoutMs / 60_000)} min` +
