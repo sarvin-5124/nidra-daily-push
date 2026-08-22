@@ -87,8 +87,19 @@
       "audience": {
         "mode": "all"
       },
-      "status": "planned",
-      "result": null
+      "status": "sent",
+      "result": {
+        "startedAt": "2026-08-22T17:20:00+05:30",
+        "lateBy": 0,
+        "campaignId": "NGCvRuQoJ46qEN1ZBgJ8",
+        "targeted": 6180,
+        "attempts": 1,
+        "campaignStatus": "partial",
+        "sent": 6155,
+        "failed": 25,
+        "failRatePct": 0.4,
+        "finishedAt": "2026-08-22T17:21:19+05:30"
+      }
     },
     {
       "key": "evening_soundscape",
