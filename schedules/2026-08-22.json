@@ -151,8 +151,19 @@
       "audience": {
         "mode": "all"
       },
-      "status": "planned",
-      "result": null
+      "status": "sent",
+      "result": {
+        "startedAt": "2026-08-22T21:37:00+05:30",
+        "lateBy": 0,
+        "campaignId": "rCdZWBgjXpZFEjzDQXBS",
+        "targeted": 6172,
+        "attempts": 1,
+        "campaignStatus": "partial",
+        "sent": 6148,
+        "failed": 24,
+        "failRatePct": 0.39,
+        "finishedAt": "2026-08-22T21:38:20+05:30"
+      }
     }
   ]
 }
