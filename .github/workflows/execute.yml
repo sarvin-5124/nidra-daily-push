@@ -1,21 +1,40 @@
 name: execute-slot
 
-# Script 2 — sends one slot's broadcast. Cron times are UTC, IST minus 5:30:
-#   04:30 → 10:00 IST   morning_focus
-#   08:30 → 14:00 IST   afternoon_soundscape
-#   11:30 → 17:00 IST   evening_meditation
-#   13:30 → 19:00 IST   evening_soundscape
-#   16:00 → 21:30 IST   night_nidra
-# The script picks the slot from the wall clock, waits out that slot's jitter,
-# then sends — so GitHub's own cron lag (5–15 min is normal) is absorbed rather
-# than compounded.
+# Script 2 — sends one slot's broadcast. Cron times are UTC, IST minus 5:30.
+#
+# Each slot gets TWO triggers, and neither sits on :00 or :30. GitHub's schedule
+# queue is contended by the minute and worst at the top of the hour: on
+# 2026-08-22 the single '30 4' trigger for morning_focus started at 05:00:00Z,
+# a full 30 min late, which is longer than that day's 16 min of jitter — so the
+# sleep-out-the-jitter design had nothing left to absorb the lag with and the
+# push went out only because it was fired by hand.
+#
+#   primary, 37 min BEFORE the slot — lag lands in dead time instead of eating
+#   the jitter; the script sleeps until sendAt either way
+#   backstop, 1 min before the slot — covers the primary being delayed past
+#   sendAt or dropped outright (the docs allow queued runs to be dropped)
+#
+#   03:53 + 04:29 → 10:00 IST   morning_focus
+#   07:53 + 08:29 → 14:00 IST   afternoon_soundscape
+#   10:53 + 11:29 → 17:00 IST   evening_meditation
+#   12:53 + 13:29 → 19:00 IST   evening_soundscape
+#   15:23 + 15:59 → 21:30 IST   night_nidra
+#
+# Two triggers cannot double-send: the `concurrency` group below serialises
+# them, and the loser then reads status "sent" and skips. That guard only works
+# because checkout below pins `ref: main` — see the comment there.
 on:
   schedule:
-    - cron: '30 4 * * *'
-    - cron: '30 8 * * *'
-    - cron: '30 11 * * *'
-    - cron: '30 13 * * *'
-    - cron: '0 16 * * *'
+    - cron: '53 3 * * *'
+    - cron: '29 4 * * *'
+    - cron: '53 7 * * *'
+    - cron: '29 8 * * *'
+    - cron: '53 10 * * *'
+    - cron: '29 11 * * *'
+    - cron: '53 12 * * *'
+    - cron: '29 13 * * *'
+    - cron: '23 15 * * *'
+    - cron: '59 15 * * *'
   workflow_dispatch:
     inputs:
       slot:
@@ -56,10 +75,19 @@ permissions:
 jobs:
   send:
     runs-on: ubuntu-latest
-    # Covers up to 30 min of jitter wait + send + 10 min of campaign polling.
-    timeout-minutes: 60
+    # Covers up to MAX_WAIT_MIN (75) of waiting + send + 10 min of polling.
+    timeout-minutes: 100
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Resolve the BRANCH, not the event SHA. A schedule run pins the
+          # default-branch head as it stood when the run was CREATED, and the
+          # backstop is created before the primary sends. Left on the default,
+          # the backstop would dequeue after the primary's "sent" commit and
+          # still check out the pre-send file — reading status "planned" and
+          # re-sending to the whole base. `ref: main` reads the tip at checkout
+          # time, which is what makes the idempotency guard actually hold.
+          ref: main
 
       - uses: oven-sh/setup-bun@v2
         with:

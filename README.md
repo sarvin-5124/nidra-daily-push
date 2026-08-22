@@ -8,7 +8,8 @@ separate topics.
 00:00 IST  plan-next-day   ──▶ schedules/YYYY-MM-DD.json  (committed)
                                         │
 10:00 / 14:00 / 17:00 / 19:00 / 21:30   ▼
-           execute-slot    ──▶ POST /admin/notifications/send ──▶ FCM
+  (each fired twice: -37 min, -1 min)
+           execute-slot    ──▶ sleep to sendAt ──▶ POST /admin/notifications/send ──▶ FCM
                             ──▶ poll campaign ──▶ result written back into the same file
 ```
 
@@ -21,11 +22,12 @@ rotation), so re-planning the same date reproduces the same plan. The jitter is
 the one random value, and once written it is fixed — the executor never re-rolls
 it, which is what makes the exact send times knowable a day in advance.
 
-**`scripts/execute.ts` — executor, five times a day.** Resolves which slot this
-run belongs to from the wall clock, sleeps out the remaining jitter, sends the
-campaign, polls it to a terminal status, and writes the outcome back into the
-schedule file. A slot already marked `sent` is skipped, so a rerun cannot
-double-push.
+**`scripts/execute.ts` — executor, ten triggers a day for five sends.** Resolves
+which slot this run belongs to from the wall clock, sleeps until that slot's
+planned `sendAt`, sends the campaign, polls it to a terminal status, and writes
+the outcome back into the schedule file. A slot already marked `sent` is skipped,
+so neither a rerun nor the slot's sibling trigger can double-push. Two triggers
+per slot because GitHub's scheduler is unreliable — see **Jitter** below.
 
 ## Slots
 
@@ -46,10 +48,46 @@ Each notification gets its own independent roll in `[5, 30]` minutes, added to
 the slot's wall-clock time. So 21:30 sends somewhere in 21:35–22:00, and the five
 slots on a given day are unrelated to each other.
 
-GitHub's cron is best-effort and routinely fires 5–15 minutes late. The executor
-absorbs that instead of compounding it: it waits until the planned `sendAt`, and
-if cron was so late that `sendAt` has already passed, it sends immediately and
-records `lateBy` in the result rather than skipping the push.
+GitHub's cron is best-effort. The executor absorbs the lag instead of
+compounding it: it waits until the planned `sendAt`, and if cron was so late that
+`sendAt` has already passed, it sends immediately and records `lateBy` in the
+result rather than skipping the push.
+
+That only works while there is still wait left to give up. On 2026-08-22 the
+`30 4` trigger started at **05:00:00Z — 30 minutes late**, past that day's
+`sendAt` of 10:16 IST, and the 10:00 push went out only because it was fired by
+hand. So each slot now has **two** triggers, neither on `:00` or `:30` (the two
+most contended minutes on the platform):
+
+| Slot | primary, −37 min | backstop, −1 min |
+|---|---|---|
+| 10:00 IST | `53 3` | `29 4` |
+| 14:00 IST | `53 7` | `29 8` |
+| 17:00 IST | `53 10` | `29 11` |
+| 19:00 IST | `53 12` | `29 13` |
+| 21:30 IST | `23 15` | `59 15` |
+
+The primary fires 37 minutes before the slot so that lag lands in dead time
+rather than eating the jitter; the job then sleeps until `sendAt` as before. The
+backstop covers the primary arriving after `sendAt` or being dropped outright —
+[the docs](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)
+allow queued runs to be dropped under load, and no amount of sleeping saves a run
+that never starts.
+
+**Two triggers cannot double-send.** `concurrency: nidra-execute` serialises
+them, so they never run at once; the loser then reads `status: "sent"` and skips.
+That guard depends on reading a *current* schedule file, which is why the
+checkout pins `ref: main` rather than the event SHA — a scheduled run pins the
+default-branch head as it stood when the run was *created*, and the backstop is
+created before the primary sends. On the default ref the backstop would dequeue
+after the primary's `"sent"` commit and still check out the pre-send file. The
+executor also re-reads the slot's status from the remote after a long sleep
+(`sentWhileSleeping`), fail-soft, as a second line of defence.
+
+One hole remains, and it predates this: if a send succeeds but
+`commit-schedules.sh` exhausts its 3 push attempts, nothing records `"sent"` and
+the next run will legitimately re-send. Closing that needs an idempotency key on
+`POST /admin/notifications/send`, which is the backend's call, not this repo's.
 
 ## Copy bank
 
@@ -137,6 +175,11 @@ Both workflows also have `workflow_dispatch`, with the same overrides as inputs.
 
 - **Cron only runs on the default branch.** Changes to the schedule times or the
   scripts have to land on `main` to take effect.
+- **A green run does not mean the cron was on time.** A run that finds its slot
+  already sent exits successfully in ~10s, which is indistinguishable from a
+  healthy skip. Lag *before* a job starts is invisible from inside it — the only
+  witness is the run's `created_at` against the cron minute (`gh run list`).
+  `lateBy` in the schedule file only measures lag after the job began.
 - **GitHub disables scheduled workflows in a repo with 60 days of no commits.**
   The executor commits a result on every send, so this repo stays active on its
   own — but if sends stop, the crons eventually stop too. The fail topic going
@@ -150,3 +193,5 @@ Both workflows also have `workflow_dispatch`, with the same overrides as inputs.
   image while these carry none, are product calls this repo does not make on its own.
 - **A missing schedule file fails loudly.** If the midnight planner failed, the
   10:00 executor pings the fail topic instead of sending something improvised.
+- **Cron lag is documented behaviour, not a bug to chase.** See
+  `learnings/github-cron-lag.md` for the 2026-08-22 incident and the numbers.

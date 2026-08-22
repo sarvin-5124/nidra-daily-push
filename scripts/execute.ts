@@ -1,13 +1,21 @@
 #!/usr/bin/env bun
 /**
- * Script 2 — executor. Cron fires near each slot (10:00, 14:00, 17:00, 19:00,
- * 21:30 IST); this reads today's committed schedule, waits out the remaining
- * jitter, sends the broadcast, polls the campaign to a terminal status, and
- * writes the outcome back into the schedule file.
+ * Script 2 — executor. Two crons fire per slot (10:00, 14:00, 17:00, 19:00,
+ * 21:30 IST): one 37 min early, one a minute before. Either way this reads
+ * today's committed schedule, sleeps until the slot's planned sendAt, sends the
+ * broadcast, polls the campaign to a terminal status, and writes the outcome
+ * back into the schedule file.
  *
- * Idempotent: a slot already marked "sent" is skipped, so a rerun of the same
- * cron cannot double-push.
+ * Firing early is what makes the sleep useful. GitHub's schedule queue is
+ * best-effort and was measured 30 min late on 2026-08-22 — longer than that
+ * day's jitter, so there was no wait left to absorb it with. A 37 min lead puts
+ * the lag in dead time instead.
+ *
+ * Idempotent: a slot already marked "sent" is skipped, so neither a rerun nor
+ * the sibling trigger can double-push. That rests on reading a CURRENT
+ * schedule file — see `ref: main` in execute.yml and `sentWhileSleeping` below.
  */
+import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { sendCampaign, waitForCampaign, type Campaign } from './lib/api.ts';
@@ -18,8 +26,17 @@ import type { PlannedSlot, Schedule } from './lib/types.ts';
 const ROOT = join(import.meta.dirname, '..');
 /** How far past its slot time a run may still claim a slot. */
 const CLAIM_WINDOW_MIN = 150;
-/** Refuse to sit on a runner for longer than this waiting for sendAt. */
-const MAX_WAIT_MIN = 45;
+/**
+ * How far BEFORE its slot time a run may claim a slot. The primary cron fires
+ * 37 min early on purpose, so this has to clear that with room to spare.
+ */
+const EARLY_WINDOW_MIN = 45;
+/**
+ * Refuse to sit on a runner for longer than this waiting for sendAt.
+ * 37 min of deliberate lead + 30 min of maximum jitter = 67, so 75 covers the
+ * worst legitimate case and still trips on a genuinely wrong schedule date.
+ */
+const MAX_WAIT_MIN = 75;
 /**
  * Delivery is judged on the failure RATE, not on the campaign status string.
  *
@@ -61,7 +78,10 @@ function minutesBetween(a: Date, b: Date): number {
 /**
  * Which slot does this run belong to? Nearest slot whose scheduled wall-clock
  * time is within the claim window of now — GitHub's cron is routinely 5–15 min
- * late, so exact matching would strand runs.
+ * late (30 min observed), so exact matching would strand runs.
+ *
+ * Nearest-wins keeps the early window safe: at 20:53 IST the 21:30 slot scores
+ * -37 and the 19:00 slot +113, so an early fire cannot steal the previous slot.
  */
 function resolveSlot(schedule: Schedule, now: Date): PlannedSlot {
   const override = process.env.SLOT_KEY;
@@ -72,7 +92,7 @@ function resolveSlot(schedule: Schedule, now: Date): PlannedSlot {
   }
   const scored = schedule.slots
     .map((s) => ({ s, lateMin: minutesBetween(now, istInstant(schedule.date, s.slotAt)) }))
-    .filter((x) => x.lateMin >= -20 && x.lateMin <= CLAIM_WINDOW_MIN)
+    .filter((x) => x.lateMin >= -EARLY_WINDOW_MIN && x.lateMin <= CLAIM_WINDOW_MIN)
     .sort((a, b) => Math.abs(a.lateMin) - Math.abs(b.lateMin));
 
   if (scored.length === 0) {
@@ -84,6 +104,45 @@ function resolveSlot(schedule: Schedule, now: Date): PlannedSlot {
     );
   }
   return scored[0].s;
+}
+
+/**
+ * Did another run send this slot while we slept? Re-reads the slot's status
+ * from the remote rather than trusting the file checked out before the wait.
+ *
+ * Normally redundant, and deliberately so. `ref: main` means the checkout was
+ * current, and the workflow's `concurrency` group means two executor runs never
+ * overlap — so on-disk is already authoritative. This is the belt to that
+ * braces: if the group is ever dropped, or two runs do overlap, a sleeping run
+ * is holding a file that predates the other one's send. One fetch is cheap
+ * against 6.5k duplicate pushes.
+ *
+ * Reads FETCH_HEAD, not origin/main: FETCH_HEAD is written by every fetch
+ * regardless of how the remote's refspec is configured.
+ *
+ * Fail-soft on purpose. A git or network error here must never become a MISSED
+ * push, so anything unexpected logs and lets the send go ahead.
+ */
+function sentWhileSleeping(date: string, slotKey: string): string | null {
+  try {
+    execFileSync('git', ['fetch', '--quiet', '--depth=1', 'origin', 'main'], {
+      cwd: ROOT,
+      stdio: ['ignore', 'ignore', 'pipe'],
+    });
+    const raw = execFileSync('git', ['show', `FETCH_HEAD:schedules/${date}.json`], {
+      cwd: ROOT,
+      encoding: 'utf8',
+    });
+    const fresh = JSON.parse(raw) as Schedule;
+    const remote = fresh.slots.find((x) => x.key === slotKey);
+    if (remote?.status === 'sent') return remote.result?.campaignId ?? 'unknown';
+    return null;
+  } catch (err) {
+    console.warn(
+      `[exec] could not re-check the remote schedule before sending: ${(err as Error).message}`,
+    );
+    return null;
+  }
 }
 
 async function sendWithRetry(
@@ -189,6 +248,20 @@ async function main() {
     }
     console.log(`[exec] ${slot.key}: waiting ${Math.round(waitMin)} min for jitter (sendAt ${slot.sendAt})`);
     await new Promise((r) => setTimeout(r, waitMin * 60_000));
+
+    const raced = sentWhileSleeping(date, slot.key);
+    if (raced) {
+      console.log(
+        `[exec] ${slot.key} was sent by another run during this one's wait (campaign ${raced}); nothing to do`,
+      );
+      await notify(
+        'info',
+        `Nidra ${slot.key} already sent`,
+        `Another run sent ${date} ${slot.key} while this one waited out its jitter. Campaign ${raced}.`,
+        ['repeat'],
+      );
+      return;
+    }
   } else {
     // Cron lag ate the jitter. Send now and record how late — never skip.
     lateBy = Math.round(-waitMin);
