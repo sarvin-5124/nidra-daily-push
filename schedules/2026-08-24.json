@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "date": "2026-08-24",
+  "tz": "Asia/Kolkata",
+  "generatedAt": "2026-08-23T00:26:25+05:30",
+  "generatedBy": "gha:32592220890",
+  "slots": [
+    {
+      "key": "morning_focus",
+      "slotAt": "10:00",
+      "jitterMin": 13,
+      "sendAt": "2026-08-24T10:13:00+05:30",
+      "item": {
+        "kind": "meditations",
+        "id": "med-yognidra",
+        "title": "Yog Nidra",
+        "durationMin": 13
+      },
+      "copyId": "mf-36",
+      "title": "You do not have to earn rest",
+      "body": "Take the break now. Start Yog Nidra and sit quietly.",
+      "route": "/(app)/player/med-yognidra?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    },
+    {
+      "key": "afternoon_soundscape",
+      "slotAt": "14:00",
+      "jitterMin": 21,
+      "sendAt": "2026-08-24T14:21:00+05:30",
+      "item": {
+        "kind": "soundscapes",
+        "id": "thunder",
+        "title": "Thunder",
+        "durationMin": 20
+      },
+      "copyId": "as-05",
+      "title": "Turn the afternoon down",
+      "body": "Put Thunder on low and keep going with your work.",
+      "route": "/(app)/player/thunder?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    },
+    {
+      "key": "evening_meditation",
+      "slotAt": "17:00",
+      "jitterMin": 15,
+      "sendAt": "2026-08-24T17:15:00+05:30",
+      "item": {
+        "kind": "meditations",
+        "id": "med-evening-wind-down",
+        "title": "Wind Down",
+        "durationMin": 3
+      },
+      "copyId": "em-24",
+      "title": "Stop working right now",
+      "body": "Not forever. Just long enough to start Wind Down.",
+      "route": "/(app)/player/med-evening-wind-down?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    },
+    {
+      "key": "evening_soundscape",
+      "slotAt": "19:00",
+      "jitterMin": 12,
+      "sendAt": "2026-08-24T19:12:00+05:30",
+      "item": {
+        "kind": "soundscapes",
+        "id": "rain",
+        "title": "Rain",
+        "durationMin": 20
+      },
+      "copyId": "es-23",
+      "title": "Still going after all day? 🍃",
+      "body": "Let Rain carry the next 20 minutes for you.",
+      "route": "/(app)/player/rain?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    },
+    {
+      "key": "night_nidra",
+      "slotAt": "21:30",
+      "jitterMin": 8,
+      "sendAt": "2026-08-24T21:38:00+05:30",
+      "item": {
+        "kind": "sessions",
+        "id": "stress-relief",
+        "title": "Stress Relief",
+        "durationMin": 27
+      },
+      "copyId": "nn-01",
+      "title": "Let today go now 🌙",
+      "body": "Start Stress Relief. It asks nothing from you.",
+      "route": "/(app)/player/stress-relief?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    }
+  ]
+}
