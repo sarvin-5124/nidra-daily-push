@@ -15,15 +15,16 @@
  * the sibling trigger can double-push. That rests on reading a CURRENT
  * schedule file — see `ref: main` in execute.yml and `sentWhileSleeping` below.
  */
-import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
-import { sendCampaign, waitForCampaign, type Campaign } from './lib/api.ts';
-import { notify } from './lib/ntfy.ts';
-import { istDateKey, istISO, istInstant } from './lib/time.ts';
-import type { PlannedSlot, Schedule } from './lib/types.ts';
+import { execFileSync } from "node:child_process";
+import { readFileSync, existsSync } from "node:fs";
+import { join } from "node:path";
+import { sendCampaign, waitForCampaign, type Campaign } from "./lib/api.ts";
+import { writeJSONAtomic } from "./lib/io.ts";
+import { notify } from "./lib/ntfy.ts";
+import { istDateKey, istISO, istInstant } from "./lib/time.ts";
+import type { PlannedSlot, Schedule } from "./lib/types.ts";
 
-const ROOT = join(import.meta.dirname, '..');
+const ROOT = join(import.meta.dirname, "..");
 /** How far past its slot time a run may still claim a slot. */
 const CLAIM_WINDOW_MIN = 150;
 /**
@@ -57,8 +58,8 @@ const FAIL_RATE_ALERT = (() => {
   // Actions always defines the env key, so an unset variable arrives as "" — and
   // `??` does not catch that. Number("") is 0, which would put the threshold at
   // 0% and page the fail topic on every send.
-  const raw = (process.env.FAIL_RATE_ALERT ?? '').trim();
-  const pct = raw === '' ? 10 : Number(raw);
+  const raw = (process.env.FAIL_RATE_ALERT ?? "").trim();
+  const pct = raw === "" ? 10 : Number(raw);
   return (Number.isFinite(pct) && pct > 0 ? pct : 10) / 100;
 })();
 /**
@@ -87,16 +88,22 @@ function resolveSlot(schedule: Schedule, now: Date): PlannedSlot {
   const override = process.env.SLOT_KEY;
   if (override) {
     const s = schedule.slots.find((x) => x.key === override);
-    if (!s) throw new Error(`SLOT_KEY="${override}" is not in ${schedule.date}.json`);
+    if (!s)
+      throw new Error(`SLOT_KEY="${override}" is not in ${schedule.date}.json`);
     return s;
   }
   const scored = schedule.slots
-    .map((s) => ({ s, lateMin: minutesBetween(now, istInstant(schedule.date, s.slotAt)) }))
-    .filter((x) => x.lateMin >= -EARLY_WINDOW_MIN && x.lateMin <= CLAIM_WINDOW_MIN)
+    .map((s) => ({
+      s,
+      lateMin: minutesBetween(now, istInstant(schedule.date, s.slotAt)),
+    }))
+    .filter(
+      (x) => x.lateMin >= -EARLY_WINDOW_MIN && x.lateMin <= CLAIM_WINDOW_MIN,
+    )
     .sort((a, b) => Math.abs(a.lateMin) - Math.abs(b.lateMin));
 
   if (scored.length === 0) {
-    const times = schedule.slots.map((s) => s.slotAt).join(', ');
+    const times = schedule.slots.map((s) => s.slotAt).join(", ");
     throw new Error(
       `no slot near ${istISO(now)} in ${schedule.date}.json (slots: ${times}). Cron fired far ` +
         `outside every window, or the schedule date is not today; ` +
@@ -125,17 +132,24 @@ function resolveSlot(schedule: Schedule, now: Date): PlannedSlot {
  */
 function sentWhileSleeping(date: string, slotKey: string): string | null {
   try {
-    execFileSync('git', ['fetch', '--quiet', '--depth=1', 'origin', 'main'], {
+    execFileSync("git", ["fetch", "--quiet", "--depth=1", "origin", "main"], {
       cwd: ROOT,
-      stdio: ['ignore', 'ignore', 'pipe'],
+      stdio: ["ignore", "ignore", "pipe"],
+      timeout: 10_000,
     });
-    const raw = execFileSync('git', ['show', `FETCH_HEAD:schedules/${date}.json`], {
-      cwd: ROOT,
-      encoding: 'utf8',
-    });
+    const raw = execFileSync(
+      "git",
+      ["show", `FETCH_HEAD:schedules/${date}.json`],
+      {
+        cwd: ROOT,
+        encoding: "utf8",
+        timeout: 10_000,
+      },
+    );
     const fresh = JSON.parse(raw) as Schedule;
     const remote = fresh.slots.find((x) => x.key === slotKey);
-    if (remote?.status === 'sent') return remote.result?.campaignId ?? 'unknown';
+    if (remote?.status === "sent")
+      return remote.result?.campaignId ?? "unknown";
     return null;
   } catch (err) {
     console.warn(
@@ -148,7 +162,7 @@ function sentWhileSleeping(date: string, slotKey: string): string | null {
 async function sendWithRetry(
   slot: PlannedSlot,
   schedule: Schedule,
-  audience: PlannedSlot['audience'] = slot.audience,
+  audience: PlannedSlot["audience"] = slot.audience,
 ) {
   const payload = {
     audience,
@@ -160,25 +174,28 @@ async function sendWithRetry(
       scheduleDate: schedule.date,
       copyId: slot.copyId,
       itemId: slot.item.id,
-      source: 'push_daily',
+      source: "push_daily",
     },
-    sentBy: 'gha-daily-push',
+    sentBy: "gha-daily-push",
   };
   let lastErr: Error | null = null;
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       const res = await sendCampaign(payload);
       console.log(
-        `[exec] queued campaign ${res.campaignId} · targeted ${res.targetedCount} · ${res.audienceDesc ?? ''}`,
+        `[exec] queued campaign ${res.campaignId} · targeted ${res.targetedCount} · ${res.audienceDesc ?? ""}`,
       );
       return { res, attempts: attempt };
     } catch (e) {
       lastErr = e as Error;
-      console.warn(`[exec] send attempt ${attempt}/3 failed: ${lastErr.message}`);
-      if (attempt < 3) await new Promise((r) => setTimeout(r, attempt * 15_000));
+      console.warn(
+        `[exec] send attempt ${attempt}/3 failed: ${lastErr.message}`,
+      );
+      if (attempt < 3)
+        await new Promise((r) => setTimeout(r, attempt * 15_000));
     }
   }
-  throw lastErr ?? new Error('send failed');
+  throw lastErr ?? new Error("send failed");
 }
 
 /**
@@ -187,13 +204,13 @@ async function sendWithRetry(
  * the scheduled audience, because that fallback is a broadcast to the whole base.
  */
 function resolveTestSend(): { userId: string } | null {
-  const mode = (process.env.AUDIENCE_MODE || 'schedule').trim();
-  const userId = (process.env.TEST_USER_ID || '').trim();
-  if (mode === 'single_user') {
+  const mode = (process.env.AUDIENCE_MODE || "schedule").trim();
+  const userId = (process.env.TEST_USER_ID || "").trim();
+  if (mode === "single_user") {
     if (!userId) {
       throw new Error(
-        'AUDIENCE_MODE=single_user needs TEST_USER_ID — refusing to send. Without an id this ' +
-          'run would fall through to the scheduled audience, which is every notifiable user.',
+        "AUDIENCE_MODE=single_user needs TEST_USER_ID — refusing to send. Without an id this " +
+          "run would fall through to the scheduled audience, which is every notifiable user.",
       );
     }
     return { userId };
@@ -209,25 +226,27 @@ function resolveTestSend(): { userId: string } | null {
 async function main() {
   const test = resolveTestSend();
   const date = process.env.SCHEDULE_DATE || istDateKey();
-  const path = join(ROOT, 'schedules', `${date}.json`);
+  const path = join(ROOT, "schedules", `${date}.json`);
   if (!existsSync(path)) {
     throw new Error(
       `no schedule for ${date} — schedules/${date}.json is missing. The midnight planner ` +
         `either failed or its commit never landed on the default branch.`,
     );
   }
-  const schedule = JSON.parse(readFileSync(path, 'utf8')) as Schedule;
+  const schedule = JSON.parse(readFileSync(path, "utf8")) as Schedule;
   const now = new Date();
   const slot = resolveSlot(schedule, now);
 
-  if (slot.status === 'sent' && !test) {
+  if (slot.status === "sent" && !test) {
     const r = slot.result;
-    console.log(`[exec] ${slot.key} already sent (campaign ${r?.campaignId}); nothing to do`);
+    console.log(
+      `[exec] ${slot.key} already sent (campaign ${r?.campaignId}); nothing to do`,
+    );
     await notify(
-      'info',
+      "info",
       `Nidra ${slot.key} already sent`,
-      `Skipped duplicate run for ${date}. Campaign ${r?.campaignId}: ${r?.sent ?? '?'} delivered, ${r?.failed ?? '?'} failed.`,
-      ['repeat'],
+      `Skipped duplicate run for ${date}. Campaign ${r?.campaignId}: ${r?.sent ?? "?"} delivered, ${r?.failed ?? "?"} failed.`,
+      ["repeat"],
     );
     return;
   }
@@ -246,7 +265,9 @@ async function main() {
           `this job will wait. Cron fired far too early for slot ${slot.key}.`,
       );
     }
-    console.log(`[exec] ${slot.key}: waiting ${Math.round(waitMin)} min for jitter (sendAt ${slot.sendAt})`);
+    console.log(
+      `[exec] ${slot.key}: waiting ${Math.round(waitMin)} min for jitter (sendAt ${slot.sendAt})`,
+    );
     await new Promise((r) => setTimeout(r, waitMin * 60_000));
 
     const raced = sentWhileSleeping(date, slot.key);
@@ -255,21 +276,23 @@ async function main() {
         `[exec] ${slot.key} was sent by another run during this one's wait (campaign ${raced}); nothing to do`,
       );
       await notify(
-        'info',
+        "info",
         `Nidra ${slot.key} already sent`,
         `Another run sent ${date} ${slot.key} while this one waited out its jitter. Campaign ${raced}.`,
-        ['repeat'],
+        ["repeat"],
       );
       return;
     }
   } else {
     // Cron lag ate the jitter. Send now and record how late — never skip.
     lateBy = Math.round(-waitMin);
-    console.warn(`[exec] ${slot.key}: ${lateBy} min past sendAt, sending immediately`);
+    console.warn(
+      `[exec] ${slot.key}: ${lateBy} min past sendAt, sending immediately`,
+    );
   }
 
   const audience = test
-    ? { mode: 'userIds', userIds: [test.userId] }
+    ? { mode: "userIds", userIds: [test.userId] }
     : slot.audience;
 
   slot.result = { startedAt: istISO(new Date()), lateBy };
@@ -280,13 +303,13 @@ async function main() {
       // The send has already left — the backend fans out in a goroutine — so this
       // cannot prevent delivery, only make a wrong audience impossible to miss.
       await notify(
-        'fail',
-        'Nidra TEST SEND hit too many recipients',
+        "fail",
+        "Nidra TEST SEND hit too many recipients",
         `Test send for ${slot.key} targeted ${res.targetedCount} recipients for user ` +
           `${test.userId}, over the ${TEST_MAX_RECIPIENTS} cap. Campaign ${res.campaignId}. ` +
           `Check that the backend still accepts audience mode "userIds" — an unrecognised ` +
           `mode may have resolved to every notifiable user.`,
-        ['rotating_light'],
+        ["rotating_light"],
       );
       throw new Error(
         `test send targeted ${res.targetedCount} recipients (cap ${TEST_MAX_RECIPIENTS}) — ` +
@@ -299,16 +322,19 @@ async function main() {
     campaign = await waitForCampaign(res.campaignId);
   } catch (e) {
     if (test) throw e; // Never record a test against the real slot.
-    slot.status = 'failed';
+    slot.status = "failed";
     slot.result.error = (e as Error).message;
     slot.result.finishedAt = istISO(new Date());
-    writeFileSync(path, JSON.stringify(schedule, null, 2) + '\n', 'utf8');
+    writeJSONAtomic(path, schedule);
     throw e;
   }
 
-  const failRate = campaign.targetedCount > 0 ? campaign.failedCount / campaign.targetedCount : 0;
+  const failRate =
+    campaign.targetedCount > 0
+      ? campaign.failedCount / campaign.targetedCount
+      : 0;
   // "failed", or a send that reached nobody, is the only real delivery failure.
-  const delivered = campaign.status !== 'failed' && campaign.sentCount > 0;
+  const delivered = campaign.status !== "failed" && campaign.sentCount > 0;
 
   slot.result.campaignStatus = campaign.status;
   slot.result.targeted = campaign.targetedCount;
@@ -328,45 +354,61 @@ async function main() {
       `Schedule file untouched — ${slot.key} will still send to everyone at ${slot.slotAt}.`;
     console.log(`[exec] TEST SEND complete: ${JSON.stringify(slot.result)}`);
     if (delivered) {
-      await notify('ok', `Nidra TEST SEND ok · ${slot.key}`, line, ['test_tube']);
+      await notify("ok", `Nidra TEST SEND ok · ${slot.key}`, line, [
+        "test_tube",
+      ]);
     } else {
-      await notify('fail', `Nidra TEST SEND ${campaign.status} · ${slot.key}`, line, ['rotating_light']);
+      await notify(
+        "fail",
+        `Nidra TEST SEND ${campaign.status} · ${slot.key}`,
+        line,
+        ["rotating_light"],
+      );
       process.exitCode = 1;
     }
     return;
   }
 
-  slot.status = delivered ? 'sent' : 'failed';
-  writeFileSync(path, JSON.stringify(schedule, null, 2) + '\n', 'utf8');
+  slot.status = delivered ? "sent" : "failed";
+  writeJSONAtomic(path, schedule);
 
   const detail =
     `${slot.item.title} · ${slot.copyId}\n"${slot.title}"\n${slot.body}\n\n` +
     `${campaign.sentCount} delivered · ${campaign.failedCount} failed of ${campaign.targetedCount} ` +
     `(${slot.result.failRatePct}%, status ${campaign.status})` +
-    (lateBy ? `\nsent ${lateBy} min late (cron lag)` : ` · on time (${slot.jitterMin} min jitter)`);
+    (lateBy
+      ? `\nsent ${lateBy} min late (cron lag)`
+      : ` · on time (${slot.jitterMin} min jitter)`);
 
   if (!delivered) {
-    await notify('fail', `Nidra ${slot.slotAt} ${campaign.status} · ${slot.key}`, detail, ['rotating_light']);
+    await notify(
+      "fail",
+      `Nidra ${slot.slotAt} ${campaign.status} · ${slot.key}`,
+      detail,
+      ["rotating_light"],
+    );
     process.exitCode = 1;
   } else if (failRate > FAIL_RATE_ALERT) {
     // Delivered, but far outside the historical band — usually a batch of dead
     // tokens being pruned. Worth a look, not worth failing the run: the slot is
     // marked sent so a rerun cannot re-push it.
     await notify(
-      'fail',
+      "fail",
       `Nidra ${slot.slotAt} high failure rate · ${slot.key}`,
       `${slot.result.failRatePct}% of the audience did not receive this push ` +
         `(alert above ${Math.round(FAIL_RATE_ALERT * 100)}%).\n\n${detail}`,
-      ['warning'],
+      ["warning"],
     );
   } else {
-    await notify('ok', `Nidra ${slot.slotAt} sent · ${slot.key}`, detail, ['bell']);
+    await notify("ok", `Nidra ${slot.slotAt} sent · ${slot.key}`, detail, [
+      "bell",
+    ]);
   }
 }
 
 main().catch(async (e) => {
   const msg = (e as Error).message;
   console.error(`[exec] FAILED: ${msg}`);
-  await notify('fail', 'Nidra push FAILED', msg, ['rotating_light']);
+  await notify("fail", "Nidra push FAILED", msg, ["rotating_light"]);
   process.exit(1);
 });

@@ -1,6 +1,7 @@
 // Nidra backend client: public catalog reads + the admin broadcast endpoints.
 
-export type CatalogKind = 'sessions' | 'soundscapes' | 'stories' | 'meditations';
+export type CatalogKind =
+  "sessions" | "soundscapes" | "stories" | "meditations";
 
 export interface CatalogItem {
   id: string;
@@ -22,20 +23,21 @@ export interface Campaign {
   failedCount: number;
 }
 
-const BASE = (process.env.NIDRA_API_URL || '').replace(/\/$/, '');
-const USER = process.env.NIDRA_ADMIN_USER || '';
-const PASS = process.env.NIDRA_ADMIN_PASS || '';
+const BASE = (process.env.NIDRA_API_URL || "").replace(/\/$/, "");
+const USER = process.env.NIDRA_ADMIN_USER || "";
+const PASS = process.env.NIDRA_ADMIN_PASS || "";
 
 function requireBase(): string {
-  if (!BASE) throw new Error('NIDRA_API_URL is not set');
+  if (!BASE) throw new Error("NIDRA_API_URL is not set");
   return BASE;
 }
 
 function adminHeaders(): Record<string, string> {
-  if (!USER || !PASS) throw new Error('NIDRA_ADMIN_USER / NIDRA_ADMIN_PASS are not set');
+  if (!USER || !PASS)
+    throw new Error("NIDRA_ADMIN_USER / NIDRA_ADMIN_PASS are not set");
   return {
-    Authorization: `Basic ${Buffer.from(`${USER}:${PASS}`).toString('base64')}`,
-    'Content-Type': 'application/json',
+    Authorization: `Basic ${Buffer.from(`${USER}:${PASS}`).toString("base64")}`,
+    "Content-Type": "application/json",
   };
 }
 
@@ -53,11 +55,23 @@ async function json<T>(res: Response, what: string): Promise<T> {
 }
 
 export async function fetchCatalog(kind: CatalogKind): Promise<CatalogItem[]> {
-  const res = await fetch(`${requireBase()}/v1/catalog/${kind}`, {
-    signal: AbortSignal.timeout(20_000),
-  });
-  const data = await json<{ items?: CatalogItem[] }>(res, `catalog ${kind}`);
-  return data.items ?? [];
+  let lastErr: Error | null = null;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const res = await fetch(`${requireBase()}/v1/catalog/${kind}`, {
+        signal: AbortSignal.timeout(20_000),
+      });
+      const data = await json<{ items?: CatalogItem[] }>(
+        res,
+        `catalog ${kind}`,
+      );
+      return data.items ?? [];
+    } catch (e) {
+      lastErr = e as Error;
+      if (attempt < 3) await new Promise((r) => setTimeout(r, attempt * 5_000));
+    }
+  }
+  throw lastErr ?? new Error(`catalog ${kind}: fetch failed`);
 }
 
 export interface SendPayload {
@@ -72,12 +86,12 @@ export interface SendPayload {
 
 export async function sendCampaign(payload: SendPayload): Promise<SendResult> {
   const res = await fetch(`${requireBase()}/admin/notifications/send`, {
-    method: 'POST',
+    method: "POST",
     headers: adminHeaders(),
     body: JSON.stringify(payload),
     signal: AbortSignal.timeout(60_000),
   });
-  return json<SendResult>(res, 'admin send');
+  return json<SendResult>(res, "admin send");
 }
 
 export async function getCampaign(id: string): Promise<Campaign> {
@@ -85,7 +99,7 @@ export async function getCampaign(id: string): Promise<Campaign> {
     `${requireBase()}/admin/notifications/campaign/${encodeURIComponent(id)}`,
     { headers: adminHeaders(), signal: AbortSignal.timeout(30_000) },
   );
-  return json<Campaign>(res, 'admin campaign');
+  return json<Campaign>(res, "admin campaign");
 }
 
 /**
@@ -97,7 +111,7 @@ export async function waitForCampaign(
   id: string,
   { timeoutMs = 10 * 60_000, intervalMs = 5_000 } = {},
 ): Promise<Campaign> {
-  const terminal = new Set(['completed', 'partial', 'failed']);
+  const terminal = new Set(["completed", "partial", "failed"]);
   const deadline = Date.now() + timeoutMs;
   let last: Campaign | null = null;
   while (Date.now() < deadline) {
@@ -115,6 +129,8 @@ export async function waitForCampaign(
   }
   throw new Error(
     `campaign ${id} did not reach a terminal status within ${Math.round(timeoutMs / 60_000)} min` +
-      (last ? ` (last: ${last.status}, ${last.sentCount} sent, ${last.failedCount} failed)` : ''),
+      (last
+        ? ` (last: ${last.status}, ${last.sentCount} sent, ${last.failedCount} failed)`
+        : ""),
   );
 }

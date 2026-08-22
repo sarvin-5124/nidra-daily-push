@@ -8,21 +8,35 @@
  * the same plan; only the jitter is genuinely random, and once written it is
  * fixed — the executor obeys the file, never re-rolls.
  */
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import { randomInt } from 'node:crypto';
-import { join } from 'node:path';
-import { fetchCatalog, type CatalogItem, type CatalogKind } from './lib/api.ts';
-import { notify } from './lib/ntfy.ts';
-import { rotate, seedFrom, shuffled } from './lib/rng.ts';
-import { istDateKey, istDayIndex, istISO, istInstant, nextDateKey, prevDateKey } from './lib/time.ts';
-import type { CopyBank, PlannedSlot, Schedule, SlotConfig, SlotsConfig } from './lib/types.ts';
+import { readFileSync, mkdirSync, existsSync } from "node:fs";
+import { randomInt } from "node:crypto";
+import { join } from "node:path";
+import { fetchCatalog, type CatalogItem, type CatalogKind } from "./lib/api.ts";
+import { writeJSONAtomic } from "./lib/io.ts";
+import { notify } from "./lib/ntfy.ts";
+import { rotate, seedFrom, shuffled } from "./lib/rng.ts";
+import {
+  istDateKey,
+  istDayIndex,
+  istISO,
+  istInstant,
+  nextDateKey,
+  prevDateKey,
+} from "./lib/time.ts";
+import type {
+  CopyBank,
+  PlannedSlot,
+  Schedule,
+  SlotConfig,
+  SlotsConfig,
+} from "./lib/types.ts";
 
-const ROOT = join(import.meta.dirname, '..');
+const ROOT = join(import.meta.dirname, "..");
 const MAX_TITLE = 45;
 const MAX_BODY = 120;
 
 function readJSON<T>(rel: string): T {
-  return JSON.parse(readFileSync(join(ROOT, rel), 'utf8')) as T;
+  return JSON.parse(readFileSync(join(ROOT, rel), "utf8")) as T;
 }
 
 /** Pool for a slot, after include / exclude / same-day exclusions. */
@@ -54,7 +68,9 @@ function poolFor(
   if (items.length === 0) {
     // Fall back to the unfiltered kind rather than dropping the slot: a missing
     // push is worse than a same-day repeat.
-    console.warn(`[plan] ${slot.key}: pool empty after filters, falling back to all ${slot.pool.kind}`);
+    console.warn(
+      `[plan] ${slot.key}: pool empty after filters, falling back to all ${slot.pool.kind}`,
+    );
     return all.filter((i) => !new Set(slot.pool.exclude ?? []).has(i.id));
   }
   return items;
@@ -62,8 +78,11 @@ function poolFor(
 
 function substitute(s: string, item: CatalogItem): string {
   return s
-    .replaceAll('{item}', item.title ?? item.id)
-    .replaceAll('{min}', item.durationMin != null ? String(item.durationMin) : '');
+    .replaceAll("{item}", item.title ?? item.id)
+    .replaceAll(
+      "{min}",
+      item.durationMin != null ? String(item.durationMin) : "",
+    );
 }
 
 /**
@@ -77,7 +96,8 @@ function pickCopy(
   item: CatalogItem,
 ): { copyId: string; title: string; body: string } {
   const variants = bank.slots[copySlot]?.variants;
-  if (!variants?.length) throw new Error(`copybank has no variants for slot "${copySlot}"`);
+  if (!variants?.length)
+    throw new Error(`copybank has no variants for slot "${copySlot}"`);
 
   // Fixed permutation stepped one per day — same reasoning as rotate() in
   // lib/rng.ts: a per-cycle reshuffle repeats across the boundary.
@@ -89,18 +109,25 @@ function pickCopy(
     const title = substitute(v.title, item).trim();
     const body = substitute(v.body, item).trim();
     if (title.length <= MAX_TITLE && body.length <= MAX_BODY) {
-      if (i > 0) console.warn(`[plan] ${copySlot}: skipped ${i} over-length variant(s)`);
+      if (i > 0)
+        console.warn(`[plan] ${copySlot}: skipped ${i} over-length variant(s)`);
       return { copyId: v.id, title, body };
     }
   }
   const v = perm[start];
-  console.warn(`[plan] ${copySlot}: every variant is over-length for "${item.title}", using ${v.id} as-is`);
-  return { copyId: v.id, title: substitute(v.title, item).trim(), body: substitute(v.body, item).trim() };
+  console.warn(
+    `[plan] ${copySlot}: every variant is over-length for "${item.title}", using ${v.id} as-is`,
+  );
+  return {
+    copyId: v.id,
+    title: substitute(v.title, item).trim(),
+    body: substitute(v.body, item).trim(),
+  };
 }
 
 async function main() {
-  const cfg = readJSON<SlotsConfig>('config/slots.json');
-  const bank = readJSON<CopyBank>('config/copybank.json');
+  const cfg = readJSON<SlotsConfig>("config/slots.json");
+  const bank = readJSON<CopyBank>("config/copybank.json");
 
   // SCHEDULE_DATE lets you re-plan a specific IST day by hand; the cron path
   // always plans tomorrow.
@@ -109,24 +136,28 @@ async function main() {
 
   // Yesterday's picks, when the file is there — best effort, absence is fine.
   const yesterday = new Map<string, string>();
-  const prevPath = join(ROOT, 'schedules', `${prevDateKey(date)}.json`);
+  const prevPath = join(ROOT, "schedules", `${prevDateKey(date)}.json`);
   if (existsSync(prevPath)) {
     try {
-      const prev = JSON.parse(readFileSync(prevPath, 'utf8')) as Schedule;
+      const prev = JSON.parse(readFileSync(prevPath, "utf8")) as Schedule;
       for (const s of prev.slots) yesterday.set(s.key, s.item.id);
     } catch (e) {
-      console.warn(`[plan] could not read ${prevPath}: ${(e as Error).message}`);
+      console.warn(
+        `[plan] could not read ${prevPath}: ${(e as Error).message}`,
+      );
     }
   }
 
   const kinds = [...new Set(cfg.slots.map((s) => s.pool.kind))];
   const catalog = new Map<CatalogKind, CatalogItem[]>();
-  for (const kind of kinds) {
-    const items = await fetchCatalog(kind);
-    if (items.length === 0) throw new Error(`catalog "${kind}" came back empty`);
+  const fetched = await Promise.all(kinds.map((kind) => fetchCatalog(kind)));
+  kinds.forEach((kind, i) => {
+    const items = fetched[i];
+    if (items.length === 0)
+      throw new Error(`catalog "${kind}" came back empty`);
     catalog.set(kind, items);
     console.log(`[plan] catalog ${kind}: ${items.length} items`);
-  }
+  });
 
   const picked = new Map<string, string>();
   const slots: PlannedSlot[] = [];
@@ -138,7 +169,10 @@ async function main() {
 
     const copy = pickCopy(bank, slot.copySlot, dayIndex, item);
     // Independent roll per notification — inclusive of both bounds.
-    const jitterMin = randomInt(cfg.jitterMinutes.min, cfg.jitterMinutes.max + 1);
+    const jitterMin = randomInt(
+      cfg.jitterMinutes.min,
+      cfg.jitterMinutes.max + 1,
+    );
     const sendAt = istInstant(date, slot.at, jitterMin);
 
     slots.push({
@@ -155,9 +189,9 @@ async function main() {
       copyId: copy.copyId,
       title: copy.title,
       body: copy.body,
-      route: cfg.routeTemplate.replaceAll('{id}', item.id),
+      route: cfg.routeTemplate.replaceAll("{id}", item.id),
       audience: cfg.audience,
-      status: 'planned',
+      status: "planned",
       result: null,
     });
   }
@@ -167,29 +201,38 @@ async function main() {
     date,
     tz: cfg.tz,
     generatedAt: istISO(new Date()),
-    generatedBy: process.env.GITHUB_RUN_ID ? `gha:${process.env.GITHUB_RUN_ID}` : 'local',
+    generatedBy: process.env.GITHUB_RUN_ID
+      ? `gha:${process.env.GITHUB_RUN_ID}`
+      : "local",
     slots,
   };
 
-  const dir = join(ROOT, 'schedules');
+  const dir = join(ROOT, "schedules");
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
   const out = join(dir, `${date}.json`);
-  writeFileSync(out, JSON.stringify(schedule, null, 2) + '\n', 'utf8');
+  writeJSONAtomic(out, schedule);
 
   const lines = slots.map(
-    (s) => `${s.sendAt.slice(11, 16)} · ${s.key} · ${s.item.title} · ${s.copyId} · "${s.title}"`,
+    (s) =>
+      `${s.sendAt.slice(11, 16)} · ${s.key} · ${s.item.title} · ${s.copyId} · "${s.title}"`,
   );
-  console.log(`[plan] wrote ${out}\n${lines.join('\n')}`);
-  await notify('ok', `Nidra plan ready · ${date}`, `${slots.length} pushes planned\n\n${lines.join('\n')}`, [
-    'calendar',
-  ]);
+  console.log(`[plan] wrote ${out}\n${lines.join("\n")}`);
+  await notify(
+    "ok",
+    `Nidra plan ready · ${date}`,
+    `${slots.length} pushes planned\n\n${lines.join("\n")}`,
+    ["calendar"],
+  );
 }
 
 main().catch(async (e) => {
   const msg = (e as Error).message;
   console.error(`[plan] FAILED: ${msg}`);
-  await notify('fail', 'Nidra plan FAILED', `Tomorrow has no schedule — the executor will have nothing to send.\n\n${msg}`, [
-    'rotating_light',
-  ]);
+  await notify(
+    "fail",
+    "Nidra plan FAILED",
+    `Tomorrow has no schedule — the executor will have nothing to send.\n\n${msg}`,
+    ["rotating_light"],
+  );
   process.exit(1);
 });
