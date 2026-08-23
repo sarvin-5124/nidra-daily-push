@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "date": "2026-08-25",
+  "tz": "Asia/Kolkata",
+  "generatedAt": "2026-08-24T00:25:24+05:30",
+  "generatedBy": "gha:32659576284",
+  "slots": [
+    {
+      "key": "morning_focus",
+      "slotAt": "10:00",
+      "jitterMin": 30,
+      "sendAt": "2026-08-25T10:30:00+05:30",
+      "item": {
+        "kind": "meditations",
+        "id": "med-focus-breathing",
+        "title": "Focus Breathing",
+        "durationMin": 4
+      },
+      "copyId": "mf-09",
+      "title": "Give yourself 4 minutes",
+      "body": "That is it. Start Focus Breathing and do nothing else.",
+      "route": "/(app)/player/med-focus-breathing?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    },
+    {
+      "key": "afternoon_soundscape",
+      "slotAt": "14:00",
+      "jitterMin": 11,
+      "sendAt": "2026-08-25T14:11:00+05:30",
+      "item": {
+        "kind": "soundscapes",
+        "id": "dream",
+        "title": "Dream",
+        "durationMin": 20
+      },
+      "copyId": "as-07",
+      "title": "Pick Dream and press play",
+      "body": "Let it run, and the room around you changes.",
+      "route": "/(app)/player/dream?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    },
+    {
+      "key": "evening_meditation",
+      "slotAt": "17:00",
+      "jitterMin": 26,
+      "sendAt": "2026-08-25T17:26:00+05:30",
+      "item": {
+        "kind": "meditations",
+        "id": "med-yognidra",
+        "title": "Yog Nidra",
+        "durationMin": 13
+      },
+      "copyId": "em-19",
+      "title": "Turn the noise down 🌿",
+      "body": "Start Yog Nidra. It clears what you have carried since morning.",
+      "route": "/(app)/player/med-yognidra?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    },
+    {
+      "key": "evening_soundscape",
+      "slotAt": "19:00",
+      "jitterMin": 26,
+      "sendAt": "2026-08-25T19:26:00+05:30",
+      "item": {
+        "kind": "soundscapes",
+        "id": "escape",
+        "title": "Escape",
+        "durationMin": 20
+      },
+      "copyId": "es-41",
+      "title": "Sit down and play Escape 🌙",
+      "body": "Give it 20 minutes off your feet, with sound instead of a screen.",
+      "route": "/(app)/player/escape?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    },
+    {
+      "key": "night_nidra",
+      "slotAt": "21:30",
+      "jitterMin": 11,
+      "sendAt": "2026-08-25T21:41:00+05:30",
+      "item": {
+        "kind": "sessions",
+        "id": "sleep-onset",
+        "title": "Sleep Onset",
+        "durationMin": 17
+      },
+      "copyId": "nn-16",
+      "title": "Start Sleep Onset and lie still 🌌",
+      "body": "Let tomorrow be tomorrow. Tonight you only have to listen.",
+      "route": "/(app)/player/sleep-onset?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    }
+  ]
+}
