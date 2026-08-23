@@ -23,8 +23,19 @@
       "audience": {
         "mode": "all"
       },
-      "status": "planned",
-      "result": null
+      "status": "sent",
+      "result": {
+        "startedAt": "2026-08-23T10:23:00+05:30",
+        "lateBy": 0,
+        "campaignId": "Esw9SXHMky5lhOP6Vgmy",
+        "targeted": 6194,
+        "attempts": 1,
+        "campaignStatus": "partial",
+        "sent": 6158,
+        "failed": 36,
+        "failRatePct": 0.58,
+        "finishedAt": "2026-08-23T10:23:59+05:30"
+      }
     },
     {
       "key": "afternoon_soundscape",
