@@ -55,8 +55,19 @@
       "audience": {
         "mode": "all"
       },
-      "status": "planned",
-      "result": null
+      "status": "sent",
+      "result": {
+        "startedAt": "2026-08-23T14:08:00+05:30",
+        "lateBy": 0,
+        "campaignId": "VPcsmhpRF1O617hN7b9t",
+        "targeted": 6203,
+        "attempts": 1,
+        "campaignStatus": "partial",
+        "sent": 6173,
+        "failed": 30,
+        "failRatePct": 0.48,
+        "finishedAt": "2026-08-23T14:08:39+05:30"
+      }
     },
     {
       "key": "evening_meditation",
