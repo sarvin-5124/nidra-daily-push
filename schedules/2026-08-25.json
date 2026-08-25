@@ -119,8 +119,19 @@
       "audience": {
         "mode": "all"
       },
-      "status": "planned",
-      "result": null
+      "status": "sent",
+      "result": {
+        "startedAt": "2026-08-25T19:26:00+05:30",
+        "lateBy": 0,
+        "campaignId": "EmwkPxBuHhGbDEhbSCIl",
+        "targeted": 6210,
+        "attempts": 1,
+        "campaignStatus": "partial",
+        "sent": 6198,
+        "failed": 12,
+        "failRatePct": 0.19,
+        "finishedAt": "2026-08-25T19:27:19+05:30"
+      }
     },
     {
       "key": "night_nidra",
