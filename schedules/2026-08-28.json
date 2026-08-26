@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "date": "2026-08-28",
+  "tz": "Asia/Kolkata",
+  "generatedAt": "2026-08-27T01:57:29+05:30",
+  "generatedBy": "gha:33010483404",
+  "slots": [
+    {
+      "key": "afternoon_soundscape",
+      "slotAt": "14:00",
+      "jitterMin": 9,
+      "sendAt": "2026-08-28T14:09:00+05:30",
+      "item": {
+        "kind": "soundscapes",
+        "id": "om",
+        "title": "Om",
+        "durationMin": 20
+      },
+      "copyId": "as-18",
+      "title": "Rest is not laziness 🍃",
+      "body": "A short break in the middle of the day is a sensible thing to do.",
+      "route": "/(app)/player/om?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    }
+  ]
+}
