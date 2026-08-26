@@ -2,108 +2,24 @@
   "version": 1,
   "date": "2026-08-27",
   "tz": "Asia/Kolkata",
-  "generatedAt": "2026-08-26T00:37:34+05:30",
-  "generatedBy": "gha:32887770155",
+  "generatedAt": "2026-08-26T13:35:53+05:30",
+  "generatedBy": "gha:32946002642",
   "slots": [
-    {
-      "key": "morning_focus",
-      "slotAt": "10:00",
-      "jitterMin": 22,
-      "sendAt": "2026-08-27T10:22:00+05:30",
-      "item": {
-        "kind": "meditations",
-        "id": "med-focus-breathing",
-        "title": "Focus Breathing",
-        "durationMin": 4
-      },
-      "copyId": "mf-23",
-      "title": "Begin again today 🌄",
-      "body": "Start Focus Breathing right now. One session, nothing more.",
-      "route": "/(app)/player/med-focus-breathing?source=push_daily",
-      "audience": {
-        "mode": "all"
-      },
-      "status": "planned",
-      "result": null
-    },
     {
       "key": "afternoon_soundscape",
       "slotAt": "14:00",
-      "jitterMin": 26,
-      "sendAt": "2026-08-27T14:26:00+05:30",
+      "jitterMin": 23,
+      "sendAt": "2026-08-27T14:23:00+05:30",
       "item": {
         "kind": "soundscapes",
-        "id": "thunder",
-        "title": "Thunder",
+        "id": "dream",
+        "title": "Dream",
         "durationMin": 20
       },
       "copyId": "as-33",
       "title": "Afternoon feeling long? 🌊",
-      "body": "It gets shorter after 20 minutes of Thunder.",
-      "route": "/(app)/player/thunder?source=push_daily",
-      "audience": {
-        "mode": "all"
-      },
-      "status": "planned",
-      "result": null
-    },
-    {
-      "key": "evening_meditation",
-      "slotAt": "17:00",
-      "jitterMin": 11,
-      "sendAt": "2026-08-27T17:11:00+05:30",
-      "item": {
-        "kind": "meditations",
-        "id": "med-yognidra",
-        "title": "Yog Nidra",
-        "durationMin": 13
-      },
-      "copyId": "em-22",
-      "title": "Missed yesterday? No problem 🌇",
-      "body": "Start Yog Nidra today. Nothing to make up for.",
-      "route": "/(app)/player/med-yognidra?source=push_daily",
-      "audience": {
-        "mode": "all"
-      },
-      "status": "planned",
-      "result": null
-    },
-    {
-      "key": "evening_soundscape",
-      "slotAt": "19:00",
-      "jitterMin": 9,
-      "sendAt": "2026-08-27T19:09:00+05:30",
-      "item": {
-        "kind": "soundscapes",
-        "id": "om",
-        "title": "Om",
-        "durationMin": 20
-      },
-      "copyId": "es-25",
-      "title": "Play Om, not a reel ✨",
-      "body": "Not a show, not a video. One long, steady track.",
-      "route": "/(app)/player/om?source=push_daily",
-      "audience": {
-        "mode": "all"
-      },
-      "status": "planned",
-      "result": null
-    },
-    {
-      "key": "night_nidra",
-      "slotAt": "21:30",
-      "jitterMin": 22,
-      "sendAt": "2026-08-27T21:52:00+05:30",
-      "item": {
-        "kind": "sessions",
-        "id": "sleep-onset",
-        "title": "Sleep Onset",
-        "durationMin": 17
-      },
-      "copyId": "nn-11",
-      "title": "Start Sleep Onset tonight 🌙",
-      "body": "Slow and steady, and long enough to carry you all the way down.",
-      "route": "/(app)/player/sleep-onset?source=push_daily",
+      "body": "It gets shorter after 20 minutes of Dream.",
+      "route": "/(app)/player/dream?source=push_daily",
       "audience": {
         "mode": "all"
       },
