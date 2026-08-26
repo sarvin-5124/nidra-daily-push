@@ -57,69 +57,6 @@
       },
       "status": "planned",
       "result": null
-    },
-    {
-      "key": "evening_meditation",
-      "slotAt": "17:00",
-      "jitterMin": 28,
-      "sendAt": "2026-08-26T17:28:00+05:30",
-      "item": {
-        "kind": "meditations",
-        "id": "med-focus-breathing",
-        "title": "Focus Breathing",
-        "durationMin": 4
-      },
-      "copyId": "em-34",
-      "title": "Get the workday off you",
-      "body": "It sticks. 4 minutes of Focus Breathing peels it away.",
-      "route": "/(app)/player/med-focus-breathing?source=push_daily",
-      "audience": {
-        "mode": "all"
-      },
-      "status": "planned",
-      "result": null
-    },
-    {
-      "key": "evening_soundscape",
-      "slotAt": "19:00",
-      "jitterMin": 6,
-      "sendAt": "2026-08-26T19:06:00+05:30",
-      "item": {
-        "kind": "soundscapes",
-        "id": "waves",
-        "title": "Waves",
-        "durationMin": 20
-      },
-      "copyId": "es-13",
-      "title": "Ease into the night 🌇",
-      "body": "Play Waves first, sleep later. There is no rush between them.",
-      "route": "/(app)/player/waves?source=push_daily",
-      "audience": {
-        "mode": "all"
-      },
-      "status": "planned",
-      "result": null
-    },
-    {
-      "key": "night_nidra",
-      "slotAt": "21:30",
-      "jitterMin": 27,
-      "sendAt": "2026-08-26T21:57:00+05:30",
-      "item": {
-        "kind": "sessions",
-        "id": "deep-healing",
-        "title": "Deep Healing",
-        "durationMin": 21
-      },
-      "copyId": "nn-25",
-      "title": "Let Deep Healing finish the night",
-      "body": "The day is done with you. 21 minutes, eyes closed.",
-      "route": "/(app)/player/deep-healing?source=push_daily",
-      "audience": {
-        "mode": "all"
-      },
-      "status": "planned",
-      "result": null
     }
   ]
 }

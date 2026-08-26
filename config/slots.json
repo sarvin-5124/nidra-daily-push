@@ -7,16 +7,18 @@
   "routeTemplate": "/(app)/player/{id}?source=push_daily",
   "slots": [
     {
-      "key": "morning_focus",
-      "at": "10:00",
-      "copySlot": "morning_focus",
-      "pool": { "kind": "meditations", "include": ["med-focus-breathing", "med-yognidra"] }
-    },
-    {
       "key": "afternoon_soundscape",
       "at": "14:00",
       "copySlot": "afternoon_soundscape",
       "pool": { "kind": "soundscapes" }
+    }
+  ],
+  "disabledSlots": [
+    {
+      "key": "morning_focus",
+      "at": "10:00",
+      "copySlot": "morning_focus",
+      "pool": { "kind": "meditations", "include": ["med-focus-breathing", "med-yognidra"] }
     },
     {
       "key": "evening_meditation",

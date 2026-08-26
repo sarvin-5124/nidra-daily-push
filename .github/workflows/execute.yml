@@ -23,18 +23,24 @@ name: execute-slot
 # Two triggers cannot double-send: the `concurrency` group below serialises
 # them, and the loser then reads status "sent" and skips. That guard only works
 # because checkout below pins `ref: main` — see the comment there.
+#
+# 2026-08-26: only the 14:00 IST slot is live. The other four crons are parked
+# below, not deleted — a cron with no matching slot in config/slots.json makes
+# the executor throw "no slot near ..." and page the fail topic. Re-enable by
+# uncommenting the pair here AND moving that slot out of `disabledSlots` in
+# config/slots.json.
 on:
   schedule:
-    - cron: '53 3 * * *'
-    - cron: '29 4 * * *'
-    - cron: '53 7 * * *'
+    # - cron: '53 3 * * *'    # 10:00 IST morning_focus       (parked)
+    # - cron: '29 4 * * *'
+    - cron: '53 7 * * *'      # 14:00 IST afternoon_soundscape
     - cron: '29 8 * * *'
-    - cron: '53 10 * * *'
-    - cron: '29 11 * * *'
-    - cron: '53 12 * * *'
-    - cron: '29 13 * * *'
-    - cron: '23 15 * * *'
-    - cron: '59 15 * * *'
+    # - cron: '53 10 * * *'   # 17:00 IST evening_meditation  (parked)
+    # - cron: '29 11 * * *'
+    # - cron: '53 12 * * *'   # 19:00 IST evening_soundscape  (parked)
+    # - cron: '29 13 * * *'
+    # - cron: '23 15 * * *'   # 21:30 IST night_nidra         (parked)
+    # - cron: '59 15 * * *'
   workflow_dispatch:
     inputs:
       slot:
@@ -43,11 +49,7 @@ on:
         type: choice
         options:
           - ''
-          - morning_focus
           - afternoon_soundscape
-          - evening_meditation
-          - evening_soundscape
-          - night_nidra
       date:
         description: 'IST schedule date (YYYY-MM-DD). Blank = today.'
         required: false
