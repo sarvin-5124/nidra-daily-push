@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "date": "2026-08-29",
+  "tz": "Asia/Kolkata",
+  "generatedAt": "2026-08-28T07:45:00+05:30",
+  "generatedBy": "gha:33135330312",
+  "slots": [
+    {
+      "key": "afternoon_soundscape",
+      "slotAt": "14:00",
+      "jitterMin": 19,
+      "sendAt": "2026-08-29T14:19:00+05:30",
+      "item": {
+        "kind": "soundscapes",
+        "id": "nature",
+        "title": "Nature",
+        "durationMin": 20
+      },
+      "copyId": "as-23",
+      "title": "Take the next hour lighter",
+      "body": "Work can wait. Nature is one tap away.",
+      "route": "/(app)/player/nature?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    }
+  ]
+}
