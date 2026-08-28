@@ -2,39 +2,53 @@ name: execute-slot
 
 # Script 2 — sends one slot's broadcast. Cron times are UTC, IST minus 5:30.
 #
-# Each slot gets TWO triggers, and neither sits on :00 or :30. GitHub's schedule
-# queue is contended by the minute and worst at the top of the hour: on
-# 2026-08-22 the single '30 4' trigger for morning_focus started at 05:00:00Z,
-# a full 30 min late, which is longer than that day's 16 min of jitter — so the
-# sleep-out-the-jitter design had nothing left to absorb the lag with and the
-# push went out only because it was fired by hand.
+# The live slot is 14:00 IST. It gets FIVE triggers spread across the claim
+# window, none of them on :00 or :30 — GitHub's schedule queue is contended by
+# the minute and worst at the top of the hour. Any single trigger can run late
+# or be dropped outright (the docs allow queued runs to be dropped); whichever
+# one lands first inside the window sends, and the rest read status "sent" and
+# skip.
 #
-#   primary, 37 min BEFORE the slot — lag lands in dead time instead of eating
-#   the jitter; the script sleeps until sendAt either way
-#   backstop, 1 min before the slot — covers the primary being delayed past
-#   sendAt or dropped outright (the docs allow queued runs to be dropped)
+#   cron      IST     vs 14:00  role
+#   '53 7'    13:23   -37 min   primary — lag lands in dead time, and the
+#                               script sleeps until sendAt either way
+#   '29 8'    13:59    -1 min   backstop for the primary being late or dropped
+#   '17 9'    14:47   +47 min   late-catch
+#   '53 9'    15:23   +83 min   late-catch
+#   '41 10'   16:11  +131 min   last chance before the window shuts
 #
-#   03:53 + 04:29 → 10:00 IST   morning_focus
-#   07:53 + 08:29 → 14:00 IST   afternoon_soundscape
-#   10:53 + 11:29 → 17:00 IST   evening_meditation
-#   12:53 + 13:29 → 19:00 IST   evening_soundscape
-#   15:23 + 15:59 → 21:30 IST   night_nidra
+# The window is NOT widened to fit these — the bounds live in
+# scripts/execute.ts and stay as they are. A run may claim the slot from
+# EARLY_WINDOW_MIN (45) before 14:00 to CLAIM_WINDOW_MIN (150) after it, i.e.
+# 13:15–16:30 IST, so every trigger has to sit inside that. The earliest one
+# must also clear MAX_WAIT_MIN (75) measured against the latest sendAt the
+# planner can produce (14:30, jitter max 30) — which puts the floor at 13:15
+# as well. '53 7' clears both with 8 min to spare.
 #
-# Two triggers cannot double-send: the `concurrency` group below serialises
-# them, and the loser then reads status "sent" and skips. That guard only works
+# Triggers cannot double-send: the `concurrency` group below serialises them,
+# and every loser then reads status "sent" and skips. That guard only works
 # because checkout below pins `ref: main` — see the comment there.
 #
 # 2026-08-26: only the 14:00 IST slot is live. The other four crons are parked
-# below, not deleted — a cron with no matching slot in config/slots.json makes
-# the executor throw "no slot near ..." and page the fail topic. Re-enable by
-# uncommenting the pair here AND moving that slot out of `disabledSlots` in
-# config/slots.json.
+# below, not deleted. Re-enable by uncommenting a pair here AND moving that
+# slot out of `disabledSlots` in config/slots.json.
+#
+# 2026-08-29: added the three late-catch triggers. On 08-27 and 08-28 both of
+# the then-only triggers fired ~10.5 h late (00:42 and 01:07 IST), landed
+# outside the window, and the day's push never went out at all. The extra
+# triggers cover ordinary lag and dropped runs out to +131 min. They do NOT
+# cover a shift that large — nothing inside a 3 h 15 m window can — so a
+# mistimed run is now a no-op instead of a page; see resolveSlot in
+# scripts/execute.ts.
 on:
   schedule:
     # - cron: '53 3 * * *'    # 10:00 IST morning_focus       (parked)
     # - cron: '29 4 * * *'
     - cron: '53 7 * * *'      # 14:00 IST afternoon_soundscape
     - cron: '29 8 * * *'
+    - cron: '17 9 * * *'
+    - cron: '53 9 * * *'
+    - cron: '41 10 * * *'
     # - cron: '53 10 * * *'   # 17:00 IST evening_meditation  (parked)
     # - cron: '29 11 * * *'
     # - cron: '53 12 * * *'   # 19:00 IST evening_soundscape  (parked)

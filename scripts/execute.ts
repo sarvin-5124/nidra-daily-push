@@ -1,10 +1,10 @@
 #!/usr/bin/env bun
 /**
- * Script 2 — executor. Two crons fire per slot (10:00, 14:00, 17:00, 19:00,
- * 21:30 IST): one 37 min early, one a minute before. Either way this reads
+ * Script 2 — executor. Several crons fire per slot, spread from 37 min before
+ * it to 131 min after (see execute.yml). Whichever one lands first reads
  * today's committed schedule, sleeps until the slot's planned sendAt, sends the
  * broadcast, polls the campaign to a terminal status, and writes the outcome
- * back into the schedule file.
+ * back into the schedule file. The rest read status "sent" and skip.
  *
  * Firing early is what makes the sleep useful. GitHub's schedule queue is
  * best-effort and was measured 30 min late on 2026-08-22 — longer than that
@@ -84,7 +84,7 @@ function minutesBetween(a: Date, b: Date): number {
  * Nearest-wins keeps the early window safe: at 20:53 IST the 21:30 slot scores
  * -37 and the 19:00 slot +113, so an early fire cannot steal the previous slot.
  */
-function resolveSlot(schedule: Schedule, now: Date): PlannedSlot {
+function resolveSlot(schedule: Schedule, now: Date): PlannedSlot | null {
   const override = process.env.SLOT_KEY;
   if (override) {
     const s = schedule.slots.find((x) => x.key === override);
@@ -102,13 +102,21 @@ function resolveSlot(schedule: Schedule, now: Date): PlannedSlot {
     )
     .sort((a, b) => Math.abs(a.lateMin) - Math.abs(b.lateMin));
 
+  // Not an error, and deliberately not a page. With several triggers per slot
+  // a mistimed one is an ordinary outcome, and this run cannot tell "GitHub
+  // dequeued me 10 h late" from "the day is already handled" — on 2026-08-27
+  // and -28 every trigger fired around 01:00 IST, so both days threw here and
+  // paged the fail topic while the actual defect (the slot still sitting at
+  // status "planned") went unreported. Exit 0 and leave the fail topic for
+  // things a send can actually go wrong at.
   if (scored.length === 0) {
     const times = schedule.slots.map((s) => s.slotAt).join(", ");
-    throw new Error(
-      `no slot near ${istISO(now)} in ${schedule.date}.json (slots: ${times}). Cron fired far ` +
-        `outside every window, or the schedule date is not today; ` +
-        `set SLOT_KEY to run one deliberately.`,
+    console.warn(
+      `[exec] no slot near ${istISO(now)} in ${schedule.date}.json (slots: ${times}). Cron fired ` +
+        `far outside every window, or the schedule date is not today; ` +
+        `set SLOT_KEY to run one deliberately. Nothing to do.`,
     );
+    return null;
   }
   return scored[0].s;
 }
@@ -236,17 +244,16 @@ async function main() {
   const schedule = JSON.parse(readFileSync(path, "utf8")) as Schedule;
   const now = new Date();
   const slot = resolveSlot(schedule, now);
+  if (!slot) return;
 
   if (slot.status === "sent" && !test) {
     const r = slot.result;
+    // Log only. Four of the five triggers are EXPECTED to land here on a
+    // normal day, and pinging the ok topic each time buries the one ping that
+    // means something — the send itself.
     console.log(
-      `[exec] ${slot.key} already sent (campaign ${r?.campaignId}); nothing to do`,
-    );
-    await notify(
-      "info",
-      `Nidra ${slot.key} already sent`,
-      `Skipped duplicate run for ${date}. Campaign ${r?.campaignId}: ${r?.sent ?? "?"} delivered, ${r?.failed ?? "?"} failed.`,
-      ["repeat"],
+      `[exec] ${slot.key} already sent (campaign ${r?.campaignId}): ` +
+        `${r?.sent ?? "?"} delivered, ${r?.failed ?? "?"} failed; nothing to do`,
     );
     return;
   }
@@ -272,14 +279,9 @@ async function main() {
 
     const raced = sentWhileSleeping(date, slot.key);
     if (raced) {
+      // Log only, same reasoning as the skip above.
       console.log(
         `[exec] ${slot.key} was sent by another run during this one's wait (campaign ${raced}); nothing to do`,
-      );
-      await notify(
-        "info",
-        `Nidra ${slot.key} already sent`,
-        `Another run sent ${date} ${slot.key} while this one waited out its jitter. Campaign ${raced}.`,
-        ["repeat"],
       );
       return;
     }
