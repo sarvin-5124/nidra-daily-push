@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "date": "2026-08-30",
+  "tz": "Asia/Kolkata",
+  "generatedAt": "2026-08-29T07:18:49+05:30",
+  "generatedBy": "gha:33227379033",
+  "slots": [
+    {
+      "key": "afternoon_soundscape",
+      "slotAt": "14:00",
+      "jitterMin": 27,
+      "sendAt": "2026-08-30T14:27:00+05:30",
+      "item": {
+        "kind": "soundscapes",
+        "id": "om",
+        "title": "Om",
+        "durationMin": 20
+      },
+      "copyId": "as-26",
+      "title": "Make the rest of today easier",
+      "body": "Play Om now, and the afternoon eases up on its own.",
+      "route": "/(app)/player/om?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    }
+  ]
+}
