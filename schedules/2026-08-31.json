@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "date": "2026-08-31",
+  "tz": "Asia/Kolkata",
+  "generatedAt": "2026-08-30T02:33:03+05:30",
+  "generatedBy": "gha:33275039929",
+  "slots": [
+    {
+      "key": "afternoon_soundscape",
+      "slotAt": "14:00",
+      "jitterMin": 29,
+      "sendAt": "2026-08-31T14:29:00+05:30",
+      "item": {
+        "kind": "soundscapes",
+        "id": "peace",
+        "title": "Peace",
+        "durationMin": 20
+      },
+      "copyId": "as-35",
+      "title": "Slow sound, slower breathing ✨",
+      "body": "Put Peace on. Your breath gets longer without you trying.",
+      "route": "/(app)/player/peace?source=push_daily",
+      "audience": {
+        "mode": "all"
+      },
+      "status": "planned",
+      "result": null
+    }
+  ]
+}
