@@ -4,10 +4,15 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    "types": ["bun-types"],
+    "types": [
+      "bun-types"
+    ],
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true
   },
-  "include": ["scripts/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "scripts/**/*.ts"
+  ]
 }

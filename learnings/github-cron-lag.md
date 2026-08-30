@@ -78,3 +78,42 @@ same). No repo-side fix exists — it needs an idempotency key on
 `gh run list` shows the run's start, not the cron minute it was meant to serve. Compare
 `created_at` against the cron expression:
 `gh run list --workflow execute-slot --json createdAt,event,conclusion,databaseId`
+
+## The lag got much worse, and killed the approach (2026-08-27 → 08-30)
+
+Four consecutive days of missed pushes. Not 30 min late — **4 to 12 hours** late,
+every trigger, every day.
+
+| date | cron (UTC) | actual (UTC) | lag |
+|---|---|---|---|
+| 08-27 | 07:53 | 18:25 | +10h32 |
+| 08-27 | 08:29 | 19:12 | +10h43 |
+| 08-28 | 07:53 | 19:37 | +11h44 |
+| 08-28 | 08:29 | 20:18 | +11h49 |
+| 08-29 | 5 triggers, 07:53–10:41 | 13:24–15:17 | +4h36 … +5h31 |
+| 08-30 | 5 triggers | 13:20–14:31 | ~+5h30 |
+
+### More triggers is NOT redundancy
+All crons in a repo share one queue. On 08-29 five triggers spread across
+**2 h 48 m of cron time** were released inside a **55-minute window** — the queue
+handed them out as a batch. Correlated failure; spreading them buys nothing
+against a queue-wide stall. They cover ordinary minutes-scale lag only.
+
+### Lag can cross the IST date boundary
+At +10 h a trigger scheduled for 13:23 IST runs at 00:42 IST **the next day** and
+reads `schedules/<tomorrow>.json`. On 08-27 the 28th's file got its only look ever
+13 h before its own window; the 28th's own triggers both read the 29th's file.
+Any date-keyed lookup has to assume the run may be on the wrong calendar day.
+
+### Suppressing the false page created a silent failure
+The first fix made a mistimed run warn-and-exit-0 instead of throwing, because
+four of five triggers legitimately hit that path. Correct for the noise, but it
+turned a missed day into **five green runs and no notification at all** — 08-29
+and 08-30 were only discovered by asking. A no-op path that is normal for one
+cause and catastrophic for another needs a *separate* check that the work actually
+happened, not just a quieter log line.
+
+### Conclusion
+Moved off the `schedule` event entirely (2026-08-30) to a 20 s tick in a
+long-lived container on the VPS. `workflow_dispatch` was never the problem — only
+the `schedule` event is best-effort — so the deploy path stayed on Actions.

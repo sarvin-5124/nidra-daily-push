@@ -1,0 +1,61 @@
+name: Deploy to VPS
+
+# The ONLY workflow in this repo, and it deliberately has no schedule trigger.
+#
+# Scheduling used to live here, and losing it is why this service moved. On
+# 2026-08-27, -28 and -29 the `schedule` event dequeued 4-12 h late, every
+# trigger landed outside its send window, and three days of pushes were lost —
+# the last day silently, as five green no-op runs. Adding more triggers did not
+# help: they share one queue, so they were late together. The clock is now a
+# 20 s tick inside the container on the VPS (src/scheduler.ts). GitHub's only
+# remaining jobs are hosting the code, taking this manual deploy, and receiving
+# the nightly schedule mirror.
+#
+# Manual by design: a push must never redeploy the process that owns a live
+# broadcast schedule. Trigger it from the Actions tab when you intend to ship.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: nidra-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch VPS credentials from secrets-manager
+        run: |
+          SM_URL="https://secrets.vps.sarvinshrivastava.space/api/secrets/Root"
+          SM_TOKEN="${{ secrets.SM_READ_TOKEN }}"
+
+          VPS_HOST=$(curl -sf -H "X-API-Key: $SM_TOKEN" "$SM_URL/VPS_HOST" | jq -r '.value')
+          echo "VPS_HOST=$VPS_HOST" >> "$GITHUB_ENV"
+
+          {
+            echo "VPS_SSH_KEY<<SSHEOF"
+            curl -sf -H "X-API-Key: $SM_TOKEN" "$SM_URL/VPS_SSH_KEY" | jq -r '.value'
+            echo "SSHEOF"
+          } >> "$GITHUB_ENV"
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ env.VPS_HOST }}
+          username: root
+          key: ${{ env.VPS_SSH_KEY }}
+          script: |
+            set -e
+            REPO_NAME=$(basename "${{ github.repository }}")
+            APP_DIR="/root/apps/$REPO_NAME"
+            if [ ! -d "$APP_DIR/.git" ]; then
+              git clone "${{ github.server_url }}/${{ github.repository }}.git" "$APP_DIR"
+            else
+              # reset --hard, not pull: the nightly mirror commits schedules/ to
+              # this repo from the container, so the checkout can sit behind the
+              # remote with no local work worth keeping. A pull would try to
+              # merge; the image only ever needs to match origin/main.
+              git -C "$APP_DIR" fetch origin main
+              git -C "$APP_DIR" reset --hard origin/main
+            fi
+            vps-deploy "$REPO_NAME" "$APP_DIR"

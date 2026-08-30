@@ -1,5 +1,5 @@
 export interface SlotPool {
-  kind: 'sessions' | 'soundscapes' | 'stories' | 'meditations';
+  kind: "sessions" | "soundscapes" | "stories" | "meditations";
   /** Whitelist of catalog ids. Omit to use the whole kind. */
   include?: string[];
   /** Ids never eligible for this slot. */
@@ -48,7 +48,13 @@ export interface PlannedSlot {
   body: string;
   route: string;
   audience: { mode: string; segment?: Record<string, unknown> };
-  status: 'planned' | 'sent' | 'failed' | 'skipped';
+  /**
+   * planned → sending → sent | failed, or missed when the window passed with
+   * the service down. `sending` is a durable in-flight marker written BEFORE
+   * the broadcast leaves, so a crash mid-send is recoverable without guessing:
+   * see recoverInFlight() in src/scheduler.ts.
+   */
+  status: "planned" | "sending" | "sent" | "failed" | "missed" | "skipped";
   result: {
     campaignId?: string;
     campaignStatus?: string;
@@ -60,6 +66,8 @@ export interface PlannedSlot {
     startedAt?: string;
     finishedAt?: string;
     lateBy?: number; // minutes past sendAt the push actually left
+    /** Set when a human triggered this from the dashboard rather than the tick. */
+    triggeredBy?: string;
     error?: string;
     attempts?: number;
   } | null;

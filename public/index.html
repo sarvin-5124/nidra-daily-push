@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Nidra Daily Push</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%238a6fd6'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand">
+    <span class="dot" id="health-dot" title="service health"></span>
+    <h1>Nidra Daily Push</h1>
+  </div>
+  <div class="bar-meta">
+    <span class="clock" id="clock">—</span>
+    <button class="ghost" id="unlock-btn" type="button">Unlock actions</button>
+  </div>
+</header>
+
+<main>
+  <!-- ── next up ───────────────────────────────────────────────────────── -->
+  <section class="card hero" id="hero">
+    <div class="hero-left">
+      <p class="eyebrow" id="hero-eyebrow">Next push</p>
+      <p class="countdown" id="countdown">—</p>
+      <p class="hero-sub" id="hero-sub">loading…</p>
+      <div class="pillrow" id="hero-pills"></div>
+    </div>
+    <div class="hero-right">
+      <div class="phone" id="phone" hidden>
+        <div class="notif">
+          <div class="notif-head">
+            <span class="notif-app">Nidra</span>
+            <span class="notif-when" id="notif-when"></span>
+          </div>
+          <p class="notif-title" id="notif-title"></p>
+          <p class="notif-body" id="notif-body"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── today ─────────────────────────────────────────────────────────── -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Today</h2>
+      <span class="muted" id="today-date"></span>
+    </div>
+    <div id="today-slots" class="slotlist"><p class="muted">loading…</p></div>
+    <dl class="kv" id="today-health"></dl>
+  </section>
+
+  <!-- ── actions (token-gated) ─────────────────────────────────────────── -->
+  <section class="card locked" id="actions">
+    <div class="card-head">
+      <h2>Actions</h2>
+      <span class="muted" id="actions-state">locked</span>
+    </div>
+
+    <div class="lockpad" id="lockpad">
+      <p class="muted">These routes change live state — one of them broadcasts to the whole
+      member base. Paste the dashboard token to enable them.</p>
+      <form class="tokenform" id="token-form">
+        <input type="password" id="token-input" placeholder="dashboard token"
+               autocomplete="off" spellcheck="false">
+        <button type="submit">Unlock</button>
+      </form>
+      <p class="err" id="token-err" hidden></p>
+    </div>
+
+    <div class="actionpad" id="actionpad" hidden>
+      <div class="action">
+        <div>
+          <h3>Test send</h3>
+          <p class="muted">One user id only. Caps recipients and never marks the slot sent.</p>
+        </div>
+        <form id="test-form">
+          <input type="text" id="test-user" placeholder="user id" autocomplete="off">
+          <select id="test-slot"></select>
+          <button type="submit">Test send</button>
+        </form>
+      </div>
+
+      <div class="action danger">
+        <div>
+          <h3>Send now</h3>
+          <p class="muted">Full audience, immediately. No undo. Only works on a slot still
+          <code>planned</code> or <code>failed</code>.</p>
+        </div>
+        <form id="send-form">
+          <select id="send-slot"></select>
+          <button type="submit" class="red">Send to everyone</button>
+        </form>
+      </div>
+
+      <div class="action">
+        <div>
+          <h3>Re-plan a day</h3>
+          <p class="muted">Rebuilds the schedule. Refuses a day with settled slots unless forced.</p>
+        </div>
+        <form id="plan-form">
+          <input type="date" id="plan-date">
+          <label class="check"><input type="checkbox" id="plan-force"> force</label>
+          <button type="submit">Re-plan</button>
+        </form>
+      </div>
+
+      <div class="action">
+        <div>
+          <h3>Mirror to git now</h3>
+          <p class="muted">Pushes changed schedule files to the repo. Runs nightly at 02:00 IST.</p>
+        </div>
+        <form id="mirror-form"><button type="submit">Mirror</button></form>
+      </div>
+    </div>
+
+    <p class="out" id="action-out" hidden></p>
+  </section>
+
+  <!-- ── history ───────────────────────────────────────────────────────── -->
+  <section class="card">
+    <div class="card-head">
+      <h2>History</h2>
+      <span class="muted" id="history-summary"></span>
+    </div>
+    <div class="tablewrap">
+      <table id="history">
+        <thead>
+          <tr>
+            <th>Date</th><th>Slot</th><th>Sent at</th><th>Status</th>
+            <th class="num">Targeted</th><th class="num">Delivered</th>
+            <th class="num">Failed</th><th class="num">Fail %</th><th class="num">Late</th>
+            <th>Item / copy</th>
+          </tr>
+        </thead>
+        <tbody><tr><td colspan="10" class="muted">loading…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── logs (token-gated) ────────────────────────────────────────────── -->
+  <section class="card" id="logcard">
+    <div class="card-head">
+      <h2>Log</h2>
+      <span class="muted" id="log-note">unlock actions to read the log</span>
+    </div>
+    <pre class="log" id="log" hidden></pre>
+  </section>
+</main>
+
+<footer>
+  <p class="muted">Scheduled on this box, not on GitHub&rsquo;s queue.
+  Schedules live on the volume; git holds the nightly mirror.</p>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

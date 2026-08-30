@@ -1,16 +1,21 @@
 #!/usr/bin/env bun
 /**
- * Script 1 — next-day schedule creator. Runs at 00:00 IST.
+ * Stage 1 — schedule creator, called by the scheduler shortly after 00:00 IST
+ * and on demand from the dashboard.
  *
  * Picks one catalog item and one copy variant per slot, rolls an independent
- * jitter per slot, and writes schedules/<IST date>.json. Content picking is
- * deterministic (date-seeded rotation), so a rerun for the same date reproduces
- * the same plan; only the jitter is genuinely random, and once written it is
- * fixed — the executor obeys the file, never re-rolls.
+ * jitter per slot, and writes <DATA_DIR>/schedules/<IST date>.json. Content
+ * picking is deterministic (date-seeded rotation), so a rerun for the same date
+ * reproduces the same plan; only the jitter is genuinely random, and once
+ * written it is fixed — the executor obeys the file, never re-rolls.
+ *
+ * config/ is read from the image (immutable, versioned in git); the schedule it
+ * produces is written to the volume. See src/paths.ts for why those differ.
  */
 import { readFileSync, mkdirSync, existsSync } from "node:fs";
 import { randomInt } from "node:crypto";
 import { join } from "node:path";
+import { ROOT, SCHEDULE_DIR, schedulePath } from "../src/paths.ts";
 import { fetchCatalog, type CatalogItem, type CatalogKind } from "./lib/api.ts";
 import { writeJSONAtomic } from "./lib/io.ts";
 import { notify } from "./lib/ntfy.ts";
@@ -31,7 +36,6 @@ import type {
   SlotsConfig,
 } from "./lib/types.ts";
 
-const ROOT = join(import.meta.dirname, "..");
 const MAX_TITLE = 45;
 const MAX_BODY = 120;
 
@@ -125,18 +129,24 @@ function pickCopy(
   };
 }
 
-async function main() {
+/**
+ * Build and persist the schedule for one IST date, then ping the ok topic.
+ *
+ * Returns the schedule it wrote. Throws on any failure — the caller decides
+ * whether that is worth paging for, because a missing schedule matters far more
+ * at 13:00 than it does at 00:05 with a whole day left to retry.
+ */
+export async function buildSchedule(dateArg?: string): Promise<Schedule> {
   const cfg = readJSON<SlotsConfig>("config/slots.json");
   const bank = readJSON<CopyBank>("config/copybank.json");
 
-  // SCHEDULE_DATE lets you re-plan a specific IST day by hand; the cron path
-  // always plans tomorrow.
-  const date = process.env.SCHEDULE_DATE || nextDateKey(istDateKey());
+  const date =
+    dateArg || process.env.SCHEDULE_DATE || nextDateKey(istDateKey());
   const dayIndex = istDayIndex(date);
 
   // Yesterday's picks, when the file is there — best effort, absence is fine.
   const yesterday = new Map<string, string>();
-  const prevPath = join(ROOT, "schedules", `${prevDateKey(date)}.json`);
+  const prevPath = schedulePath(prevDateKey(date));
   if (existsSync(prevPath)) {
     try {
       const prev = JSON.parse(readFileSync(prevPath, "utf8")) as Schedule;
@@ -201,15 +211,14 @@ async function main() {
     date,
     tz: cfg.tz,
     generatedAt: istISO(new Date()),
-    generatedBy: process.env.GITHUB_RUN_ID
-      ? `gha:${process.env.GITHUB_RUN_ID}`
+    generatedBy: process.env.SERVICE_NAME
+      ? `vps:${process.env.SERVICE_NAME}`
       : "local",
     slots,
   };
 
-  const dir = join(ROOT, "schedules");
-  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-  const out = join(dir, `${date}.json`);
+  if (!existsSync(SCHEDULE_DIR)) mkdirSync(SCHEDULE_DIR, { recursive: true });
+  const out = schedulePath(date);
   writeJSONAtomic(out, schedule);
 
   const lines = slots.map(
@@ -223,16 +232,21 @@ async function main() {
     `${slots.length} pushes planned\n\n${lines.join("\n")}`,
     ["calendar"],
   );
+  return schedule;
 }
 
-main().catch(async (e) => {
-  const msg = (e as Error).message;
-  console.error(`[plan] FAILED: ${msg}`);
-  await notify(
-    "fail",
-    "Nidra plan FAILED",
-    `Tomorrow has no schedule — the executor will have nothing to send.\n\n${msg}`,
-    ["rotating_light"],
-  );
-  process.exit(1);
-});
+// CLI use: `bun run scripts/plan.ts`. The long-running service imports
+// buildSchedule directly and does its own error handling.
+if (import.meta.main) {
+  buildSchedule().catch(async (e) => {
+    const msg = (e as Error).message;
+    console.error(`[plan] FAILED: ${msg}`);
+    await notify(
+      "fail",
+      "Nidra plan FAILED",
+      `That day has no schedule — the executor will have nothing to send.\n\n${msg}`,
+      ["rotating_light"],
+    );
+    process.exit(1);
+  });
+}
