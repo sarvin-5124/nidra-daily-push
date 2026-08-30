@@ -117,10 +117,16 @@ export async function mirrorNow(reason = "scheduled"): Promise<MirrorState> {
   for (let i = 0; i < MIRROR_DAYS; i++, date = prevDateKey(date)) {
     if (!hasSchedule(date)) continue;
     const repoPath = `schedules/${date}.json`;
-    const local = readFileSync(schedulePath(date), "utf8");
     checked++;
     try {
       const remote = await remoteFile(repoPath);
+      // Read local AFTER the fetch, not before. Reading first and comparing
+      // after the await meant the scheduler could write between the two: on
+      // 2026-08-30 the boot mirror read today's file as "planned", the first
+      // tick then marked it "missed", and the stale read matched the remote so
+      // the change was skipped. The next nightly run picked it up, but the
+      // window is avoidable — keep the read as close to the compare as it gets.
+      const local = readFileSync(schedulePath(date), "utf8");
       if (remote && remote.text === local) continue;
       await putFile(
         repoPath,
