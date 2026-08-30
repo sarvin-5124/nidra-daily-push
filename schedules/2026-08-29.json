@@ -23,8 +23,11 @@
       "audience": {
         "mode": "all"
       },
-      "status": "planned",
-      "result": null
+      "status": "missed",
+      "result": {
+        "finishedAt": "2026-08-30T23:37:58+05:30",
+        "error": "never sent; the date passed with the slot still planned"
+      }
     }
   ]
 }
