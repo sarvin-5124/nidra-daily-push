@@ -11,7 +11,7 @@
 import { captureConsole } from "./runlog.ts";
 import { ensureDataDir } from "./paths.ts";
 import { maybeMirror } from "./mirror.ts";
-import { schedulerHealth, startScheduler } from "./scheduler.ts";
+import { schedulerHealth, startScheduler, whenSettled } from "./scheduler.ts";
 import { startServer } from "./server.ts";
 
 /** How often to ask the mirror whether it is due. Cheap: two comparisons. */
@@ -29,7 +29,10 @@ const server = startServer();
 const stopScheduler = startScheduler();
 
 const mirrorTimer = setInterval(() => void maybeMirror(), MIRROR_CHECK_MS);
-void maybeMirror();
+// Wait for the first tick before mirroring at boot. That tick is what settles
+// today's slot (missed / sent), and a mirror running alongside it publishes the
+// pre-tick state — which is exactly what happened on the first deploy.
+void whenSettled().then(() => maybeMirror());
 
 /**
  * Stop cleanly, and actually EXIT.

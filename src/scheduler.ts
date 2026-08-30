@@ -374,6 +374,12 @@ async function tick(): Promise<void> {
   void ensurePlans(today);
 }
 
+/** Resolves once the first tick has completed, so boot-time work can wait. */
+let firstTickDone: Promise<void> = Promise.resolve();
+export function whenSettled(): Promise<void> {
+  return firstTickDone;
+}
+
 /** Start the tick loop. Returns a stop function. */
 export function startScheduler(): () => void {
   console.log(
