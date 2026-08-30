@@ -23,8 +23,12 @@
       "audience": {
         "mode": "all"
       },
-      "status": "planned",
-      "result": null
+      "status": "missed",
+      "result": {
+        "finishedAt": "2026-08-30T23:37:58+05:30",
+        "lateBy": 551,
+        "error": "551 min past sendAt with no send; window is 60 min"
+      }
     }
   ]
 }
