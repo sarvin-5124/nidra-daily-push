@@ -1,0 +1,10 @@
+.git
+node_modules
+# Local dev state. The real schedules live on a Docker volume, and copying a
+# developer's copy into the image would seed the volume with it on first boot.
+.data
+.playwright-mcp
+review
+learnings
+*.md
+.DS_Store

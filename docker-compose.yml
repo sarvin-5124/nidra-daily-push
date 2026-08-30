@@ -1,0 +1,28 @@
+services:
+  app:
+    build: .
+    container_name: ${SERVICE_NAME:-nidra-daily-push}
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    env_file:
+      - .env
+    environment:
+      - PORT=3000
+      - SERVICE_NAME=${SERVICE_NAME:-nidra-daily-push}
+      - DATA_DIR=/data
+    volumes:
+      # Schedules are the record of what was sent to real people. They must
+      # survive an image rebuild, so they live outside the container.
+      - nidra-push-data:/data
+    healthcheck:
+      # /healthz reports 503 once the tick loop stops advancing, which is the
+      # one failure this service cannot page about on its own behalf.
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/healthz"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  nidra-push-data:
